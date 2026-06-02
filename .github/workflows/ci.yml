@@ -11,6 +11,12 @@ jobs:
     name: typecheck + lint + test
     runs-on: ubuntu-latest
 
+    env:
+      # Valor fake — necessário só pra prisma.config.ts não reclamar.
+      # prisma generate lê apenas o schema, não toca no banco.
+      # Substituir por service Postgres quando houver teste de integração.
+      DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci_fake?schema=public"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
