@@ -1,0 +1,1 @@
+export type { EnvConfig } from "./env.validation";

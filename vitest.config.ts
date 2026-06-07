@@ -7,8 +7,8 @@ export default defineConfig({
   test: {
     globals: true,
     passWithNoTests: true,
-    include: ["test/**/*.spec.ts"],
-    exclude: ["**/*.e2e-spec.ts", "node_modules", "dist"],
+    include: ["test/**/*.spec.ts", "test/**/*.e2e-spec.ts"],
+    exclude: ["node_modules", "dist"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
