@@ -37,12 +37,11 @@ export default [
     },
     settings: {
       "boundaries/elements": [
-        { type: "domain",         pattern: "src/modules/*/domain" },
-        { type: "application",    pattern: "src/modules/*/application" },
-        { type: "infrastructure", pattern: "src/modules/*/infrastructure" },
-        { type: "presentation",   pattern: "src/modules/*/presentation" },
-        { type: "shared",         pattern: "src/shared" },
-        { type: "root",           pattern: "src/(main|app.module).ts", mode: "file" }
+        { type: "domain",       pattern: "src/modules/*/domain" },
+        { type: "application",  pattern: "src/modules/*/application" },
+        { type: "presentation", pattern: "src/modules/*/presentation" },
+        { type: "shared",       pattern: "src/shared" },
+        { type: "root",         pattern: "src/(main|app.module).ts", mode: "file" }
       ],
       "boundaries/include": ["src/**/*"]
     },
@@ -50,12 +49,11 @@ export default [
       "boundaries/element-types": ["error", {
         default: "disallow",
         rules: [
-          { from: "domain",         allow: ["domain", "shared"] },
-          { from: "application",    allow: ["application", "domain", "shared"] },
-          { from: "infrastructure", allow: ["infrastructure", "application", "domain", "shared"] },
-          { from: "presentation",   allow: ["presentation", "application", "domain", "shared"] },
-          { from: "shared",         allow: ["shared"] },
-          { from: "root",           allow: ["domain", "application", "infrastructure", "presentation", "shared", "root"] }
+          { from: "domain",       allow: ["domain", "shared"] },
+          { from: "application",  allow: ["application", "domain", "shared"] },
+          { from: "presentation", allow: ["presentation", "application", "domain", "shared"] },
+          { from: "shared",       allow: ["shared"] },
+          { from: "root",         allow: ["domain", "application", "presentation", "shared", "root"] }
         ]
       }],
       "@typescript-eslint/naming-convention": [

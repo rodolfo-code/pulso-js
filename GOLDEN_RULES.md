@@ -34,11 +34,11 @@
 
 ## Bounded context (módulos)
 
-7. **Módulos não importam arquivos internos uns dos outros.**
-   Porquê: a fronteira é o `*.module.ts` e o que ele exporta. Importar `modules/A/domain/X` de dentro de `modules/B/` quebra o isolamento.
+7. **Módulos não importam arquivos uns dos outros.**
+   Porquê: vocabulário compartilhado (entidades, value objects, repositórios) vive em `shared/`. Se dois módulos precisam do mesmo conceito, esse conceito sobe pra `shared/` — não atravessa por dentro de outro módulo.
 
-8. **Um Prisma model não é compartilhado entre módulos.**
-   Porquê: módulos acabam acoplados pelo schema sem ninguém perceber. Cada tabela tem um módulo dono; outros acessam via interface.
+8. **Entidades, value objects, errors e repositórios moram em `shared/`.**
+   Porquê: modelos e tabelas são patrimônio do projeto, não de um módulo. Cada módulo consome o vocabulário compartilhado; nenhum cria seu próprio `Agent`, `SLO`, `HealthScore` etc. Implementação de repositório é única — não tem cópia por módulo.
 
 ---
 
