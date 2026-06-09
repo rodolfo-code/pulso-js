@@ -123,6 +123,42 @@ A regra atual do `docs/architecture.md` diz que `modules/<feature>/domain/` só 
 
 **Ação:** atualizar `docs/architecture.md` e `pulso-js/docs/architecture.md` — `modules/<feature>/domain/` pode ter `services/` **e** `value-objects/` (e `errors/`) quando o conceito for **estritamente local** ao feature. Se vira reutilizável, sobe pra `shared/domain/`.
 
+### 8.8 Duas instâncias de `entrypoint.sh` em pastas erradas
+
+Durante a validação Docker, fiquei rodando `cat > entrypoint.sh` via Bash em dois cwds diferentes: às vezes em `pulso-js/`, às vezes em `migraçao/` (raiz da pasta-mãe). Resultado: criei `migraçao/entrypoint.sh` (versão nova) e deixei `pulso-js/entrypoint.sh` (versão antiga) intacto. O Docker build usa o segundo — por isso a imagem continuava com o entrypoint antigo, mesmo depois de várias rodadas de `--no-cache`. Custou uma cadeia longa de chutes errados ("é cache do BuildKit") até verificar `pwd` antes de cada `cat >`.
+
+**Ação:** verificar `pwd` antes de qualquer `cat > arquivo` via Bash. Pra escrever em arquivo conhecido, prefira `Write` (path absoluto) ou `cat > caminho/absoluto/do/arquivo`. Esta é uma regra geral, não específica do health.
+
+### 8.9 SWC builder mantém `src/` no path do output
+
+`pnpm build` (com NestJS CLI + builder SWC) gera `dist/src/main.js`, não `dist/main.js`. O `tsconfig.build.json` tem `rootDir: ./src`, mas o SWC não respeita isso da mesma forma que o `tsc` puro. Quebrou o entrypoint (`node dist/main.js` não achou) até descobrir o caminho real via `docker run --entrypoint ls`.
+
+**Ação:** documentar em `docs/architecture.md` ou `docs/conventions.md` — o entry point compilado mora em `dist/src/main.js` e o script `start` no `package.json` aponta pra esse caminho. Próximo módulo que precise rodar algo via `node dist/...` deve usar `dist/src/...`.
+
+### 8.10 `prisma migrate deploy` lê `prisma.config.ts` antes de checar migrations
+
+O CLI do Prisma carrega `prisma.config.ts` (e por consequência `DATABASE_URL`) **antes** de verificar se há migrations pra aplicar. Se a config falha em achar `DATABASE_URL`, o erro é `datasource.url required` — confuso porque sugere problema no schema, mas na verdade é problema de env. Em desenvolvimento (sem `.env` no container, com env via Compose), isso pareceu não estar funcionando.
+
+**Ação:** o `prisma.config.ts` agora valida `process.env.DATABASE_URL` explicitamente (lança erro claro se não estiver). O entrypoint pula `migrate deploy` quando `prisma/migrations/` não existe — então em fase travessia sem migrations, o problema não aparece. Quando criarmos a primeira migration, o `DATABASE_URL` precisa estar disponível no env do container (já está, via `environment:` no docker-compose).
+
+### 8.11 Prisma 7 generator `prisma-client` precisa de 3 opções extras pra ESM Node
+
+Por default, `generator client { provider = "prisma-client" }` no Prisma 7 gera arquivos `.ts` com imports terminando em `.ts`. Node em runtime não roda `.ts` → `ERR_MODULE_NOT_FOUND` quando o app sobe. Pra gerar JS-friendly pra Node ESM puro:
+
+```prisma
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "js"     // imports terminam em .js
+  moduleFormat        = "esm"
+  runtime             = "nodejs"
+}
+```
+
+Cuidado: `generatedFileExtension = "js"` **suprime os `.d.ts`** e o TypeScript perde os tipos do `PrismaClient`. Manter o default (`ts`) — só `importFileExtension = "js"` resolve o runtime sem perder tipos.
+
+**Ação:** documentar essas 3 opções (`importFileExtension`, `moduleFormat`, `runtime`) em `docs/architecture.md` na seção sobre Prisma. É config obrigatória pro projeto.
+
 ---
 
 ### Lacunas do harness identificadas

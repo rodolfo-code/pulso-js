@@ -1,3 +1,5 @@
+verifyDepsBeforeRun: false
+
 allowBuilds:
   '@nestjs/core': false
   '@prisma/engines': true

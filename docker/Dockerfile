@@ -1,42 +1,67 @@
-# Stage 1: builder
-FROM node:22-alpine AS builder
+# syntax=docker/dockerfile:1.7
 
+# ── Stage 1: deps ─────────────────────────────────────────
+FROM node:22-alpine AS deps
 WORKDIR /app
 
-# Install all dependencies (incluindo dev) para conseguir compilar TS
-COPY package.json package-lock.json* ./
+# Habilita Corepack (pra usar pnpm na versão fixada no packageManager)
+RUN corepack enable
+
+# Manifests primeiro (cache de layer)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma
-RUN npm ci
 
-# Generate Prisma Client e build NestJS
-COPY tsconfig*.json nest-cli.json ./
-COPY src/ ./src/
-RUN npx prisma generate && npm run build
+# Install com lockfile estrito + executa scripts pré-aprovados (allowBuilds)
+RUN pnpm install --frozen-lockfile
 
-# Stage 2: production
+# Gera Prisma Client em src/generated/prisma
+RUN pnpm prisma generate
+
+
+# ── Stage 2: build ────────────────────────────────────────
+FROM node:22-alpine AS build
+WORKDIR /app
+
+RUN corepack enable
+
+# Reaproveita node_modules + Prisma Client da stage anterior
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/src/generated ./src/generated
+
+# Manifests + configs de build
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.json tsconfig.build.json nest-cli.json .swcrc ./
+
+# Source
+COPY src ./src
+COPY prisma ./prisma
+
+# Compila TS → JS em dist/
+RUN pnpm build
+
+
+# ── Stage 3: production ───────────────────────────────────
 FROM node:22-alpine AS production
-
-# Create non-root user
-RUN addgroup -g 1001 -S appuser && \
-    adduser -u 1001 -S appuser -G appuser
-
 WORKDIR /app
 
-# Production deps + Prisma Client
-COPY package.json package-lock.json* ./
-COPY prisma ./prisma
-RUN npm ci --omit=dev && npx prisma generate && npm cache clean --force
+# OpenSSL é dependência do Prisma engine
+RUN apk add --no-cache openssl
 
-# Copy artefatos compilados
-COPY --from=builder /app/dist ./dist
+RUN corepack enable
 
-ENV NODE_ENV=production
+# Usuário não-root
+RUN addgroup -g 1001 -S pulso && adduser -u 1001 -S pulso -G pulso
 
-# Entrypoint
-COPY entrypoint.sh ./
+# Copia só o necessário pra runtime
+COPY --from=build --chown=pulso:pulso /app/dist ./dist
+COPY --from=build --chown=pulso:pulso /app/node_modules ./node_modules
+COPY --from=build --chown=pulso:pulso /app/src/generated ./src/generated
+COPY --from=build --chown=pulso:pulso /app/prisma ./prisma
+COPY --chown=pulso:pulso package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=pulso:pulso entrypoint.sh ./
 RUN chmod +x entrypoint.sh
 
-USER appuser
+USER pulso
 
 EXPOSE 8000
 

@@ -1,1 +1,2 @@
-pnpm typecheck && pnpm lint-staged
+node ./node_modules/typescript/bin/tsc --noEmit
+node ./node_modules/lint-staged/bin/lint-staged.js

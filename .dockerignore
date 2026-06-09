@@ -1,0 +1,46 @@
+# Git
+.git/
+.github/
+.gitignore
+
+# Node
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+
+# Build artifacts (gerados dentro da imagem)
+dist/
+coverage/
+
+# Generated (Prisma) — regerado dentro da imagem
+src/generated/
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.docker.example
+
+# IDEs
+.vscode/
+.idea/
+
+# Tests
+test/
+
+# Husky (dev-only)
+.husky/
+
+# Docs (mantém README)
+*.md
+!README.md
+docs/
+plans/
+
+# Docker compose e init-sql não entram na imagem
+docker/docker-compose.yml
+docker/init-agent-databases.sql
+
+# OS
+.DS_Store
+Thumbs.db

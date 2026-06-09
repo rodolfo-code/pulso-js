@@ -43,7 +43,9 @@ pulso-js/
 │   │   └── langfuse-client/      # cliente HTTP Langfuse
 │   └── modules/<feature>/        # agrupamento funcional
 │       ├── domain/
-│       │   └── services/         # domain services específicos do feature
+│       │   ├── services/         # domain services específicos do feature
+│       │   ├── value-objects/    # (opcional) VOs estritamente locais ao feature
+│       │   └── errors/           # (opcional) errors estritamente locais ao feature
 │       ├── application/
 │       │   └── use-cases/
 │       ├── presentation/         # controllers + DTOs
@@ -144,6 +146,8 @@ export class RegisterAgentUseCase {
 | **Interface (Repo/Gate)** | `shared/repositories/interfaces/`    | Contrato para acesso externo                        |
 | **Domain Service**        | `modules/<feature>/domain/services/` | Operação pura específica de uma feature             |
 
+> **Conceitos estritamente locais a uma feature** (value objects e errors usados só dentro daquele módulo) podem viver em `modules/<feature>/domain/value-objects/` e `modules/<feature>/domain/errors/`. Quando o conceito virar reutilizável por outro módulo, sobe pra `shared/domain/`. Exemplo: `HealthCheckResult` em `modules/health/domain/value-objects/`.
+
 **Vocabulário compartilhado, não bounded contexts isolados**: o pulso é um produto único. Entidades como `Agent` e `SLO` são patrimônio do projeto inteiro, não de um módulo. Cada `modules/<feature>/` agrupa use cases, controllers e domain services em torno de uma funcionalidade — sem ser dono de nenhum modelo.
 
 ---
@@ -156,6 +160,17 @@ Um único processo Node.js, organizado em camadas e em agrupamentos funcionais:
 - **`modules/<feature>/`** carrega trabalho funcional: use cases, domain services específicos, controllers, DTOs.
 - Módulos importam livremente de `shared/`. **Módulos nunca importam uns dos outros.**
 - Se dois módulos precisam do mesmo conceito, esse conceito sobe pra `shared/` — não atravessa por dentro de outro módulo.
+
+---
+
+## Health check de dependências
+
+Health checks **não passam pelo ORM**. Prisma 7 + `@prisma/adapter-pg` tem bug conhecido: `$queryRaw`/`$queryRawUnsafe` falha com `PrismaClientKnownRequestError` de mensagem vazia quando o banco está fora — impossível debugar. Em vez disso:
+
+- **Postgres**: `PrismaService.ping()` usa um `pg.Pool` dedicado (`max: 1`, `idleTimeoutMillis: 1000`) ao lado do `PrismaClient` normal. Falha com erro real (`ECONNREFUSED`, etc).
+- **Langfuse** (ou qualquer cliente HTTP externo): usar `fetch` nativo com `AbortController` (timeout 5s). Lançar em falha.
+
+Use case de health captura essas exceções e converte em status (`ok`/`degraded`/`unavailable`). Nunca propaga erro pra fora do bounded context.
 
 ---
 

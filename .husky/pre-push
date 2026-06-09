@@ -1,1 +1,1 @@
-pnpm test
+node ./node_modules/vitest/vitest.mjs run

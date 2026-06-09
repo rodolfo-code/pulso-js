@@ -104,6 +104,27 @@ return timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
 
 ---
 
+## Testes E2E com providers globais
+
+Quando um módulo depende de providers que vivem em modules `@Global` (`PrismaService`, `ILangfuseClient`, etc.), **não importar o feature module** no `Test.createTestingModule()` — o grafo de DI fica órfão porque os modules globais não são carregados pelo `TestingModule`.
+
+Padrão correto: **recriar `controllers` e `providers` direto no `TestingModule`, com fakes via `useValue`**.
+
+```ts
+const moduleRef = await Test.createTestingModule({
+  controllers: [HealthController],
+  providers: [
+    CheckSystemHealthUseCase,
+    { provide: PrismaService, useValue: new FakePrismaService() },
+    { provide: ILangfuseClient, useValue: new FakeLangfuseClient() }
+  ]
+}).compile();
+```
+
+Fakes vivem em `test/helpers/fake-*.ts`. Cada fake implementa só o método que o teste precisa exercitar (ex.: `FakePrismaService` só tem `ping()` configurável).
+
+---
+
 ## Inglês ou português?
 
 - **Código em inglês**: identificadores, comentários inline, JSDoc.
