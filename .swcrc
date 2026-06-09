@@ -15,7 +15,8 @@
     "keepClassNames": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@prisma-client/*": ["prisma/generated/client/*"]
     }
   },
   "module": {

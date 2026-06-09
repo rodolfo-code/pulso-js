@@ -9,12 +9,17 @@ export class EnvConfig {
   @IsString()
   @IsNotEmpty()
   langfuseBaseUrl!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  observatoryApiKey!: string;
 }
 
 export function validateEnv(rawEnv: Record<string, unknown>): EnvConfig {
   const mapped = {
     databaseUrl: rawEnv["DATABASE_URL"],
-    langfuseBaseUrl: rawEnv["LANGFUSE_BASE_URL"]
+    langfuseBaseUrl: rawEnv["LANGFUSE_BASE_URL"],
+    observatoryApiKey: rawEnv["OBSERVATORY_API_KEY"]
   };
   const validated = plainToInstance(EnvConfig, mapped);
   const errors = validateSync(validated, { skipMissingProperties: false });

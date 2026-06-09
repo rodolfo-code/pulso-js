@@ -3,8 +3,8 @@ import { ConfigService } from "@nestjs/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
-import { PrismaClient } from "@/generated/prisma/client";
 import type { EnvConfig } from "@/shared/config/env.config";
+import { PrismaClient } from "@prisma-client/client";
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {

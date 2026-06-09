@@ -14,7 +14,7 @@ export default [
       "node_modules/**",
       "dist/**",
       "coverage/**",
-      "src/generated/**",
+      "prisma/generated/**",
       "**/*.config.{ts,js,mjs}",
       "prisma/migrations/**"
     ]
@@ -43,7 +43,8 @@ export default [
         { type: "shared",       pattern: "src/shared" },
         { type: "root",         pattern: "src/(main|app.module).ts", mode: "file" }
       ],
-      "boundaries/include": ["src/**/*"]
+      "boundaries/include": ["src/**/*"],
+      "import/internal-regex": "^(@/|@prisma-client/)"
     },
     rules: {
       "boundaries/element-types": ["error", {
@@ -69,7 +70,10 @@ export default [
       "import/order": ["error", {
         groups: ["builtin", "external", "internal", ["parent", "sibling", "index"]],
         "newlines-between": "always",
-        pathGroups: [{ pattern: "@/**", group: "internal" }],
+        pathGroups: [
+          { pattern: "@/**", group: "internal" },
+          { pattern: "@prisma-client/**", group: "internal" }
+        ],
         alphabetize: { order: "asc", caseInsensitive: true }
       }],
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],

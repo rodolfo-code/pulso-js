@@ -10,7 +10,8 @@
   },
   "packageManager": "pnpm@11.5.0",
   "scripts": {
-    "build": "nest build && tsc-alias -p tsconfig.build.json",
+    "build": "nest build && tsc-alias -p tsconfig.build.json && pnpm prisma:compile",
+    "prisma:compile": "swc prisma/generated -d dist --copy-files",
     "dev": "nest start --watch",
     "start": "node dist/src/main.js",
     "typecheck": "tsc --noEmit",

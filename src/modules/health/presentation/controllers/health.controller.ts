@@ -1,9 +1,12 @@
 import { Controller, Get, HttpStatus, Res } from "@nestjs/common";
 import type { Response } from "express";
 
+import { Public } from "@/shared/auth/public.decorator";
+
 import { CheckSystemHealthUseCase } from "../../application/use-cases/check-system-health.use-case";
 import { HealthCheckResponseDto } from "../dto/health-check-response.dto";
 
+@Public()
 @Controller("/health")
 export class HealthController {
   constructor(private readonly checkHealth: CheckSystemHealthUseCase) {}

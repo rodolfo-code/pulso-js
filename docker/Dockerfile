@@ -14,7 +14,7 @@ COPY prisma ./prisma
 # Install com lockfile estrito + executa scripts pré-aprovados (allowBuilds)
 RUN pnpm install --frozen-lockfile
 
-# Gera Prisma Client em src/generated/prisma
+# Gera Prisma Client em prisma/generated/prisma
 RUN pnpm prisma generate
 
 
@@ -26,7 +26,7 @@ RUN corepack enable
 
 # Reaproveita node_modules + Prisma Client da stage anterior
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/src/generated ./src/generated
+COPY --from=deps /app/prisma/generated ./prisma/generated
 
 # Manifests + configs de build
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -55,7 +55,6 @@ RUN addgroup -g 1001 -S pulso && adduser -u 1001 -S pulso -G pulso
 # Copia só o necessário pra runtime
 COPY --from=build --chown=pulso:pulso /app/dist ./dist
 COPY --from=build --chown=pulso:pulso /app/node_modules ./node_modules
-COPY --from=build --chown=pulso:pulso /app/src/generated ./src/generated
 COPY --from=build --chown=pulso:pulso /app/prisma ./prisma
 COPY --chown=pulso:pulso package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --chown=pulso:pulso entrypoint.sh ./

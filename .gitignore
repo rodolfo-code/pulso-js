@@ -5,8 +5,8 @@ coverage
 # Keep environment variables out of version control
 .env
 
-# Generated files
-/src/generated
+# Generated files (Prisma Client)
+/prisma/generated
 
 # Logs
 *.log

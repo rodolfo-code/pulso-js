@@ -30,9 +30,9 @@ Trocar pra `produção` quando todos os itens das tabelas abaixo estiverem
 
 | Pacote `shared/`  | Status       | Notas                                                                                                                                                               |
 | ----------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config`          | em andamento | `@Global` — `@nestjs/config` + `validateEnv`. Apenas `databaseUrl` e `langfuseBaseUrl` registrados; faltam outras envs (LANGFUSE_PUBLIC_KEY, OBSERVATORY_API_KEY, etc.). ValidationPipe global ainda não registrado. |
+| `config`          | em andamento | `@Global` — `@nestjs/config` + `validateEnv`. Envs registradas: `databaseUrl`, `langfuseBaseUrl`, `observatoryApiKey`. Faltam `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` (Fase 2). ValidationPipe global ainda não registrado. |
 | `prisma`          | em andamento | `@Global` — `PrismaService` com adapter PG (Prisma 7). Inclui `pingPool` dedicado pra health check. Falta: schema Prisma com tabelas reais.                          |
-| `auth`            | não iniciado | `@Global` — `ApiKeyGuard`                                                                                                                                           |
+| `auth`            | migrado      | `@Global` `ApiKeyGuard` registrado como `APP_GUARD`. `@Public()` decorator pra exceções (já aplicado em `HealthController`). `timingSafeEqual` na comparação. Validado em 2026-06-09 (200 OK em rota pública, e2e cobre rotas protegidas). |
 | `http`            | não iniciado | filtro de exceção, interceptor de log                                                                                                                               |
 | `domain`          | não iniciado | vocabulário do projeto: `Agent`, `Tenant`, `System`, `SLO`, `HealthScore`, `AgentStatus`, etc. + classes base de erro                                               |
 | `repositories`    | não iniciado | `@Global` `RepositoriesModule` — implementações + abstract classes (`IAgentRepo`, `ISnapshotRepo`, `ISLORepo`, `IHealthScoreRepo`, `IAuditLogRepo`, etc.) + mappers |

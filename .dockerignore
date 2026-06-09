@@ -13,7 +13,7 @@ dist/
 coverage/
 
 # Generated (Prisma) — regerado dentro da imagem
-src/generated/
+prisma/generated/
 
 # Environment
 .env

@@ -6,7 +6,8 @@
     "lib": ["ES2022"],
     "outDir": "./dist",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@prisma-client/*": ["./prisma/generated/client/*"]
     },
     "strict": true,
     "noUncheckedIndexedAccess": true,
