@@ -12,6 +12,14 @@ export class EnvConfig {
 
   @IsString()
   @IsNotEmpty()
+  langfusePublicKey!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  langfuseSecretKey!: string;
+
+  @IsString()
+  @IsNotEmpty()
   observatoryApiKey!: string;
 }
 
@@ -19,6 +27,8 @@ export function validateEnv(rawEnv: Record<string, unknown>): EnvConfig {
   const mapped = {
     databaseUrl: rawEnv["DATABASE_URL"],
     langfuseBaseUrl: rawEnv["LANGFUSE_BASE_URL"],
+    langfusePublicKey: rawEnv["LANGFUSE_PUBLIC_KEY"],
+    langfuseSecretKey: rawEnv["LANGFUSE_SECRET_KEY"],
     observatoryApiKey: rawEnv["OBSERVATORY_API_KEY"]
   };
   const validated = plainToInstance(EnvConfig, mapped);
