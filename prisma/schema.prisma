@@ -14,3 +14,16 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model AuditLog {
+  id         String   @id @db.Uuid
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id") @db.Uuid
+  action     String
+  actor      String
+  payload    Json
+  occurredAt DateTime @map("occurred_at")
+
+  @@index([entityType, entityId])
+  @@map("audit_log")
+}

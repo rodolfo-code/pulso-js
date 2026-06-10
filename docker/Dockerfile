@@ -10,12 +10,15 @@ RUN corepack enable
 # Manifests primeiro (cache de layer)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma
+COPY prisma.config.ts ./
 
 # Install com lockfile estrito + executa scripts pré-aprovados (allowBuilds)
 RUN pnpm install --frozen-lockfile
 
 # Gera Prisma Client em prisma/generated/prisma
-RUN pnpm prisma generate
+# DATABASE_URL fake só pra parse — generate não conecta no banco;
+# a URL real vem do compose em runtime via env.
+RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm prisma generate
 
 
 # ── Stage 2: build ────────────────────────────────────────
@@ -57,6 +60,7 @@ COPY --from=build --chown=pulso:pulso /app/dist ./dist
 COPY --from=build --chown=pulso:pulso /app/node_modules ./node_modules
 COPY --from=build --chown=pulso:pulso /app/prisma ./prisma
 COPY --chown=pulso:pulso package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=pulso:pulso prisma.config.ts ./
 COPY --chown=pulso:pulso entrypoint.sh ./
 RUN chmod +x entrypoint.sh
 

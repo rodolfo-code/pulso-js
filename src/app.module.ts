@@ -6,6 +6,7 @@ import { ConfigModule } from "./shared/config/config.module";
 import { HttpModule } from "./shared/http/http.module";
 import { LangfuseClientModule } from "./shared/langfuse-client/langfuse-client.module";
 import { PrismaModule } from "./shared/prisma/prisma.module";
+import { RepositoriesModule } from "./shared/repositories/repositories.module";
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PrismaModule } from "./shared/prisma/prisma.module";
     AuthModule,
     HttpModule,
     LangfuseClientModule,
+    RepositoriesModule,
     HealthModule
   ]
 })
