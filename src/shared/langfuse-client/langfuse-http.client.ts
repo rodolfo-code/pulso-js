@@ -36,8 +36,8 @@ export class LangfuseHttpClient extends ILangfuseClient {
   }
 
   // ── Health ─────────────────────────────────────────────────────────
-  async getHealth(): Promise<void> {
-    await this.request("GET", "/api/public/health", { withAuth: false });
+  async getHealth(): Promise<LangfuseEntity> {
+    return this.request<LangfuseEntity>("GET", "/api/public/health", { withAuth: false });
   }
 
   // ── Traces ─────────────────────────────────────────────────────────
@@ -103,7 +103,7 @@ export class LangfuseHttpClient extends ILangfuseClient {
   }
 
   async getPrompt(name: string): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("GET", `/api/public/prompts/${encodeURIComponent(name)}`);
+    return this.request<LangfuseEntity>("GET", `/api/public/prompts/${name}`);
   }
 
   async createPrompt(data: LangfuseEntity): Promise<LangfuseEntity> {
@@ -111,7 +111,7 @@ export class LangfuseHttpClient extends ILangfuseClient {
   }
 
   async deletePrompt(name: string): Promise<void> {
-    await this.request("DELETE", `/api/public/prompts/${encodeURIComponent(name)}`);
+    await this.request("DELETE", `/api/public/prompts/${name}`);
   }
 
   // ── Score Configs ──────────────────────────────────────────────────
@@ -137,7 +137,7 @@ export class LangfuseHttpClient extends ILangfuseClient {
   async getDatasetItems(name: string): Promise<LangfuseList> {
     const response = await this.request<{ data?: LangfuseList }>(
       "GET",
-      `/api/public/datasets/${encodeURIComponent(name)}/items`
+      `/api/public/datasets/${name}/items`
     );
     return response.data ?? [];
   }
@@ -145,7 +145,7 @@ export class LangfuseHttpClient extends ILangfuseClient {
   async createDatasetItem(name: string, data: LangfuseEntity): Promise<LangfuseEntity> {
     return this.request<LangfuseEntity>(
       "POST",
-      `/api/public/datasets/${encodeURIComponent(name)}/items`,
+      `/api/public/datasets/${name}/items`,
       { body: data }
     );
   }

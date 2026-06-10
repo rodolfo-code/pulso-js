@@ -11,10 +11,11 @@ export class FakeLangfuseClient extends ILangfuseClient {
     this.shouldFail = value;
   }
 
-  async getHealth(): Promise<void> {
+  async getHealth(): Promise<LangfuseEntity> {
     if (this.shouldFail) {
       throw new Error("fetch failed (fake)");
     }
+    return { status: "ok" };
   }
 
   // Métodos abaixo não são exercitados pelos testes atuais (only getHealth).

@@ -61,13 +61,13 @@ describe("LangfuseHttpClient", () => {
     vi.unstubAllGlobals();
   });
 
-  it("getHealth — 204 resolves without throwing", async () => {
-    fetchMock.mockResolvedValue(mockResponse({ status: 204 }));
-    await expect(client.getHealth()).resolves.toBeUndefined();
+  it("getHealth — returns the body JSON", async () => {
+    fetchMock.mockResolvedValue(mockResponse({ status: 200, body: { status: "OK" } }));
+    await expect(client.getHealth()).resolves.toEqual({ status: "OK" });
   });
 
   it("getHealth — does NOT send Authorization header", async () => {
-    fetchMock.mockResolvedValue(mockResponse({ status: 204 }));
+    fetchMock.mockResolvedValue(mockResponse({ status: 200, body: { status: "OK" } }));
     await client.getHealth();
     const init = fetchMock.mock.calls[0]![1] as RequestInit;
     const headers = init.headers as Record<string, string>;

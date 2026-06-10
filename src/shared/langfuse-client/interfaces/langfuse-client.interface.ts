@@ -4,7 +4,7 @@ export type LangfuseList = LangfuseEntity[];
 
 export abstract class ILangfuseClient {
   // Health
-  abstract getHealth(): Promise<void>;
+  abstract getHealth(): Promise<LangfuseEntity>;
 
   // Traces
   abstract getTraces(filters?: LangfuseFilters): Promise<LangfuseList>;
