@@ -42,4 +42,16 @@ export class CircuitBreakerRepository extends ICircuitBreakerRepo {
     const rows = transitions.map((t) => CircuitBreakerTransitionMapper.toPersistence(t));
     await this.prisma.circuitBreakerTransition.createMany({ data: rows });
   }
+
+  async listHistory(
+    agentId: string,
+    cbName: string,
+    fromTime: Date
+  ): Promise<CircuitBreakerTransition[]> {
+    const rows = await this.prisma.circuitBreakerTransition.findMany({
+      where: { agentId, cbName, recordedAt: { gte: fromTime } },
+      orderBy: { recordedAt: "asc" }
+    });
+    return rows.map((row) => CircuitBreakerTransitionMapper.toDomain(row));
+  }
 }

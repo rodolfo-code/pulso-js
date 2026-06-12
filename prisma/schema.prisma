@@ -80,6 +80,8 @@ model Agent {
   circuitBreakerTransitions CircuitBreakerTransition[]
   healthScoreHistory        HealthScoreHistory[]
   snapshots                 AgentSnapshot[]
+  sloDefinitions            SLODefinition[]
+  sloEvaluations            SLOEvaluation[]
 
   @@map("agents")
 }
@@ -144,4 +146,38 @@ model AgentSnapshot {
 
   @@index([agentId, calculatedAt])
   @@map("agent_snapshots")
+}
+
+model SLODefinition {
+  id          String   @id @db.Uuid
+  agentId     String   @map("agent_id") @db.Uuid
+  metric      String
+  operator    String
+  threshold   Decimal  @db.Decimal(20, 6)
+  windowHours Int      @map("window_hours")
+  enabled     Boolean
+  createdAt   DateTime @map("created_at")
+
+  agent       Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  evaluations SLOEvaluation[]
+
+  @@index([agentId])
+  @@map("slo_definitions")
+}
+
+model SLOEvaluation {
+  id                String   @id @db.Uuid
+  sloId             String   @map("slo_id") @db.Uuid
+  agentId           String   @map("agent_id") @db.Uuid
+  status            String
+  measuredValue     Decimal? @map("measured_value") @db.Decimal(20, 6)
+  breach            Boolean
+  langfuseTraceRef  String?  @map("langfuse_trace_ref")
+  evaluatedAt       DateTime @map("evaluated_at")
+
+  slo   SLODefinition @relation(fields: [sloId], references: [id], onDelete: Cascade)
+  agent Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([sloId, evaluatedAt])
+  @@map("slo_evaluations")
 }

@@ -21,7 +21,8 @@
     { "key": "traceId", "value": "550e8400-e29b-41d4-a716-446655440000", "type": "string" },
     { "key": "sessionId", "value": "sess-abc-123", "type": "string" },
     { "key": "promptName", "value": "acme/billing/v1/greeting", "type": "string" },
-    { "key": "datasetName", "value": "eval-set", "type": "string" }
+    { "key": "datasetName", "value": "eval-set", "type": "string" },
+    { "key": "sloId", "value": "00000000-0000-4000-8000-000000000101", "type": "string" }
   ],
   "item": [
     {
@@ -168,6 +169,71 @@
               "path": ["intelligence", "agents"]
             },
             "description": "Lista todos os agentes com seus health scores calculados em paralelo. Se algum agente falhar no cálculo, o item dele volta com healthScore: null (não derruba a lista inteira)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SLOs",
+      "item": [
+        {
+          "name": "POST /slos",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agentId\": \"REPLACE_WITH_AGENT_ID\",\n  \"metric\": \"error_rate\",\n  \"operator\": \"lte\",\n  \"threshold\": 0.05,\n  \"windowHours\": 24,\n  \"enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/slos",
+              "host": ["{{baseUrl}}"],
+              "path": ["slos"]
+            },
+            "description": "Cria uma definição de SLO. metric: error_rate | avg_latency_ms | p95_latency_ms | total_requests | error_count | total_cost_usd | total_tokens | cb_open_duration_minutes[:cb_name] | cb_open_count[:cb_name] | cb_availability_pct[:cb_name]. operator: lte | gte | lt | gt."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /slos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/slos",
+              "host": ["{{baseUrl}}"],
+              "path": ["slos"]
+            },
+            "description": "Lista todas as definições de SLO."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /slos/:id/evaluate",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/slos/{{sloId}}/evaluate",
+              "host": ["{{baseUrl}}"],
+              "path": ["slos", "{{sloId}}", "evaluate"]
+            },
+            "description": "Avalia um SLO agora e persiste a avaliação. Status: ok | breach | insufficient_data. Em breach, grava audit_log com action=slo_breach. Retorna 404 se SLO não existir."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /slos/:id/evaluations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/slos/{{sloId}}/evaluations",
+              "host": ["{{baseUrl}}"],
+              "path": ["slos", "{{sloId}}", "evaluations"]
+            },
+            "description": "Histórico de avaliações de um SLO, ordenado pelo mais recente. Retorna 404 se SLO não existir."
           },
           "response": []
         }

@@ -8,7 +8,9 @@ import { IAgentRepo } from "./interfaces/agent-repo.interface";
 import { IAuditLogRepo } from "./interfaces/audit-log-repo.interface";
 import { ICircuitBreakerRepo } from "./interfaces/circuit-breaker-repo.interface";
 import { IHealthScoreRepo } from "./interfaces/health-score-repo.interface";
+import { ISLORepo } from "./interfaces/slo-repo.interface";
 import { ISnapshotRepo } from "./interfaces/snapshot-repo.interface";
+import { SLORepository } from "./slo.repository";
 import { SnapshotRepository } from "./snapshot.repository";
 
 @Global()
@@ -18,8 +20,16 @@ import { SnapshotRepository } from "./snapshot.repository";
     { provide: IAgentRepo, useClass: AgentRepository },
     { provide: ICircuitBreakerRepo, useClass: CircuitBreakerRepository },
     { provide: IHealthScoreRepo, useClass: HealthScoreRepository },
-    { provide: ISnapshotRepo, useClass: SnapshotRepository }
+    { provide: ISnapshotRepo, useClass: SnapshotRepository },
+    { provide: ISLORepo, useClass: SLORepository }
   ],
-  exports: [IAuditLogRepo, IAgentRepo, ICircuitBreakerRepo, IHealthScoreRepo, ISnapshotRepo]
+  exports: [
+    IAuditLogRepo,
+    IAgentRepo,
+    ICircuitBreakerRepo,
+    IHealthScoreRepo,
+    ISnapshotRepo,
+    ISLORepo
+  ]
 })
 export class RepositoriesModule {}

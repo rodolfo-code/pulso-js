@@ -31,6 +31,11 @@ export class EnvConfig {
   @IsInt()
   @IsPositive()
   conversationSlowThresholdMs!: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  sloMinTracesForEvaluation!: number;
 }
 
 export function validateEnv(rawEnv: Record<string, unknown>): EnvConfig {
@@ -41,7 +46,8 @@ export function validateEnv(rawEnv: Record<string, unknown>): EnvConfig {
     langfuseSecretKey: rawEnv["LANGFUSE_SECRET_KEY"],
     observatoryApiKey: rawEnv["OBSERVATORY_API_KEY"],
     heartbeatTimeoutSeconds: rawEnv["HEARTBEAT_TIMEOUT_SECONDS"] ?? 120,
-    conversationSlowThresholdMs: rawEnv["CONVERSATION_SLOW_THRESHOLD_MS"] ?? 8000
+    conversationSlowThresholdMs: rawEnv["CONVERSATION_SLOW_THRESHOLD_MS"] ?? 8000,
+    sloMinTracesForEvaluation: rawEnv["SLO_MIN_TRACES_FOR_EVALUATION"] ?? 10
   };
   const validated = plainToInstance(EnvConfig, mapped);
   const errors = validateSync(validated, { skipMissingProperties: false });
