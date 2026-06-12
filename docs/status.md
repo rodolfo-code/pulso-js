@@ -16,8 +16,8 @@ Trocar pra `produção` quando todos os itens das tabelas abaixo estiverem
 | Módulo           | Status       | Plano | Notas                                                                                           |
 | ---------------- | ------------ | ----- | ----------------------------------------------------------------------------------------------- |
 | `health`         | migrado      | [`plans/health.md`](../plans/health.md) | **Fase 1** — primeiro a migrar. Pequeno e independente; serviu como spike pra validar o harness. |
-| `langfuse-proxy` | não iniciado | —     | Fase 2 — sem dependências de outros módulos.                                                    |
-| `agents`         | não iniciado | —     | Fase 3 — fundação dos demais.                                                                   |
+| `langfuse-proxy` | migrado      | —     | **Fase 2** — 19 rotas espelhando o legado, 3 use cases (`WriteScore`, `CreatePrompt`, `CreateScoreConfig`), DTOs com `class-validator`, `taxonomy` (`buildPromptName`, `buildScoreConfigName`) em `shared/domain/services/`. Validado em Docker 2026-06-10 (6 curls: health, proxy, query, DTO 400, taxonomy, wildcard). |
+| `agents`         | migrado      | —     | **Fase 3** — `RegisterAgent` (upsert idempotente tenant→system→agent) + `ProcessHeartbeat` (recalcula status via `status-engine`, persiste CBs best-effort). 6 rotas (`POST /agents/register`, `POST /agents/:slug/heartbeat`, `GET /agents`, `GET /agents/:slug`, `GET /agents/:slug/status`, `GET /agents/:slug/circuit-breakers`). Migration `init_agents` (Tenant, System, Agent, CircuitBreakerState, CircuitBreakerTransition). Validado em Docker 2026-06-12. |
 | `intelligence`   | não iniciado | —     | Fase 4 — depende de `agents`.                                                                   |
 | `slos`           | não iniciado | —     | Fase 5 — depende de `agents`.                                                                   |
 | `observations`   | não iniciado | —     | Fase 6 — depende de `agents`.                                                                   |
@@ -30,13 +30,13 @@ Trocar pra `produção` quando todos os itens das tabelas abaixo estiverem
 
 | Pacote `shared/`  | Status       | Notas                                                                                                                                                               |
 | ----------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config`          | em andamento | `@Global` — `@nestjs/config` + `validateEnv`. Envs registradas: `databaseUrl`, `langfuseBaseUrl`, `observatoryApiKey`. Faltam `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` (Fase 2). ValidationPipe global ainda não registrado. |
-| `prisma`          | em andamento | `@Global` — `PrismaService` com adapter PG (Prisma 7). Inclui `pingPool` dedicado pra health check. Falta: schema Prisma com tabelas reais.                          |
-| `auth`            | migrado      | `@Global` `ApiKeyGuard` registrado como `APP_GUARD`. `@Public()` decorator pra exceções (já aplicado em `HealthController`). `timingSafeEqual` na comparação. Validado em 2026-06-09 (200 OK em rota pública, e2e cobre rotas protegidas). |
-| `http`            | não iniciado | filtro de exceção, interceptor de log                                                                                                                               |
-| `domain`          | não iniciado | vocabulário do projeto: `Agent`, `Tenant`, `System`, `SLO`, `HealthScore`, `AgentStatus`, etc. + classes base de erro                                               |
-| `repositories`    | não iniciado | `@Global` `RepositoriesModule` — implementações + abstract classes (`IAgentRepo`, `ISnapshotRepo`, `ISLORepo`, `IHealthScoreRepo`, `IAuditLogRepo`, etc.) + mappers |
-| `langfuse-client` | em andamento | `@Global` — `LangfuseHttpClient` com `fetch` nativo. Apenas `getHealth()` implementado; outros métodos virão na Fase 2 (langfuse-proxy).                           |
+| `config`          | migrado      | `@Global` — `@nestjs/config` + `validateEnv`. Envs registradas: `databaseUrl`, `langfuseBaseUrl`, `langfusePublicKey`, `langfuseSecretKey`, `observatoryApiKey`. `ValidationPipe` global registrado via `APP_PIPE` em `app.module.ts` (Fase 2). |
+| `prisma`          | migrado      | `@Global` — `PrismaService` com adapter PG (Prisma 7). `pingPool` dedicado pra health check. Schema com model `AuditLog` (migration `20260610000650_init_audit_log` aplicada). |
+| `auth`            | migrado      | `@Global` `ApiKeyGuard` registrado como `APP_GUARD`. `@Public()` decorator pra exceções. `timingSafeEqual` na comparação. Validado em 2026-06-09. |
+| `http`            | migrado      | `DomainExceptionFilter` global via `APP_FILTER` mapeando `DomainError` → status code via `httpStatus`. |
+| `domain`          | em andamento | Entities `Tenant`, `System`, `Agent` + VOs `AuditLogEntry`, `AgentStatus`, `CircuitBreakerState`, `CircuitBreakerTransition` + errors (`DomainError`, `DomainNotFoundError`, `DomainConflictError`, `DomainValidationError`) + services `taxonomy` + `status-engine` (compute_status com 4 testes property-based). Faltam `SLO`, `HealthScore`. |
+| `repositories`    | em andamento | `@Global` `RepositoriesModule` — binds `IAuditLogRepo`, `IAgentRepo`, `ICircuitBreakerRepo` + mappers. Faltam `ISLORepo`, `ISnapshotRepo`, `IHealthScoreRepo`. |
+| `langfuse-client` | migrado      | `@Global` — `LangfuseHttpClient` com `fetch` nativo + Basic Auth. 19 métodos cobrindo todos os endpoints do adapter Python. Validado em 2026-06-10 (proxy real respondendo). |
 
 ---
 

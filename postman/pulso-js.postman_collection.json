@@ -1,0 +1,499 @@
+{
+  "info": {
+    "name": "pulso-js",
+    "description": "Coleção da API do pulso-js — observatório de agentes (proxy do Langfuse + audit log + gestão de agentes).\n\nAuth global: header `x-api-key` (configurado na collection).\n\nVariáveis:\n- `baseUrl` — endpoint do pulso-js (default: http://localhost:8000)\n- `apiKey` — OBSERVATORY_API_KEY (default: chave de dev local)\n- `tenantSlug`, `systemSlug`, `agentSlug` — slugs de teste\n- `traceId`, `sessionId`, `promptName`, `datasetName` — IDs que você sobrescreve depois de listar",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "x-api-key", "type": "string" },
+      { "key": "value", "value": "{{apiKey}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000", "type": "string" },
+    { "key": "apiKey", "value": "9c547320f1726ae71599b89178ad00aa", "type": "string" },
+    { "key": "tenantSlug", "value": "acme", "type": "string" },
+    { "key": "systemSlug", "value": "billing", "type": "string" },
+    { "key": "agentSlug", "value": "vendas-bot", "type": "string" },
+    { "key": "traceId", "value": "550e8400-e29b-41d4-a716-446655440000", "type": "string" },
+    { "key": "sessionId", "value": "sess-abc-123", "type": "string" },
+    { "key": "promptName", "value": "acme/billing/v1/greeting", "type": "string" },
+    { "key": "datasetName", "value": "eval-set", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Health do próprio pulso-js. Retorna status + checagem de Postgres e Langfuse."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Agents",
+      "item": [
+        {
+          "name": "POST /agents/register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slug\": \"{{agentSlug}}\",\n  \"name\": \"Vendas Bot\",\n  \"description\": \"Agente de vendas — exemplo\",\n  \"version\": \"1.0.0\",\n  \"baseUrl\": \"http://vendas.local\",\n  \"tenantSlug\": \"{{tenantSlug}}\",\n  \"systemSlug\": \"{{systemSlug}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/agents/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["agents", "register"]
+            },
+            "description": "Registra um agente. Idempotente: cria tenant/system se não existirem; se o agent já existe, atualiza fields mutáveis e gera audit `agent_re_registered`."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /agents/:slug/heartbeat",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version\": \"1.0.0\",\n  \"errorCount\": 0,\n  \"circuitBreakers\": [\n    {\n      \"name\": \"llm-provider\",\n      \"state\": \"closed\",\n      \"failCount\": 0\n    },\n    {\n      \"name\": \"database\",\n      \"state\": \"closed\",\n      \"failCount\": 0\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/agents/{{agentSlug}}/heartbeat",
+              "host": ["{{baseUrl}}"],
+              "path": ["agents", "{{agentSlug}}", "heartbeat"]
+            },
+            "description": "Heartbeat do agente. Recalcula status via status-engine (HEALTHY/DEGRADED/UNHEALTHY). Persiste circuit breakers (best-effort, não bloqueia o heartbeat). Gera audit `heartbeat`."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /agents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/agents",
+              "host": ["{{baseUrl}}"],
+              "path": ["agents"]
+            },
+            "description": "Lista todos os agentes registrados."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /agents/:slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/agents/{{agentSlug}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["agents", "{{agentSlug}}"]
+            },
+            "description": "Detalhe de um agente pelo slug. Retorna 404 se não encontrado."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /agents/:slug/status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/agents/{{agentSlug}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["agents", "{{agentSlug}}", "status"]
+            },
+            "description": "Status do agente + estado atual dos circuit breakers."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /agents/:slug/circuit-breakers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/agents/{{agentSlug}}/circuit-breakers",
+              "host": ["{{baseUrl}}"],
+              "path": ["agents", "{{agentSlug}}", "circuit-breakers"]
+            },
+            "description": "Apenas os circuit breakers do agente."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Langfuse Proxy",
+      "item": [
+        {
+          "name": "Health",
+          "item": [
+            {
+              "name": "GET /langfuse/health",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/health",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "health"]
+                },
+                "description": "Proxy direto pro /api/public/health do Langfuse."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Traces",
+          "item": [
+            {
+              "name": "GET /langfuse/traces",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/traces?userId={{tenantSlug}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "traces"],
+                  "query": [
+                    { "key": "userId", "value": "{{tenantSlug}}", "description": "Filtra por user_id do trace" },
+                    { "key": "sessionId", "value": "", "disabled": true },
+                    { "key": "tags", "value": "", "disabled": true, "description": "Tag específica (pode repetir)" },
+                    { "key": "fromTimestamp", "value": "2026-06-01T00:00:00Z", "disabled": true },
+                    { "key": "toTimestamp", "value": "2026-06-30T23:59:59Z", "disabled": true }
+                  ]
+                },
+                "description": "Lista traces. Aceita filtros via query: userId, sessionId, tags, fromTimestamp, toTimestamp."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /langfuse/traces/:traceId",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/traces/{{traceId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "traces", "{{traceId}}"]
+                },
+                "description": "Detalhe de um trace específico."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /langfuse/traces/:traceId/observations",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/traces/{{traceId}}/observations",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "traces", "{{traceId}}", "observations"]
+                },
+                "description": "Observations (spans, generations, events) do trace."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Sessions",
+          "item": [
+            {
+              "name": "GET /langfuse/sessions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/sessions?userId={{tenantSlug}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "sessions"],
+                  "query": [
+                    { "key": "userId", "value": "{{tenantSlug}}" },
+                    { "key": "fromTimestamp", "value": "2026-06-01T00:00:00Z", "disabled": true },
+                    { "key": "toTimestamp", "value": "2026-06-30T23:59:59Z", "disabled": true }
+                  ]
+                },
+                "description": "Lista sessions."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /langfuse/sessions/:sessionId",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/sessions/{{sessionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "sessions", "{{sessionId}}"]
+                },
+                "description": "Detalhe da session."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Scores",
+          "item": [
+            {
+              "name": "GET /langfuse/scores",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/scores?name={{tenantSlug}}/latency-ms",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "scores"],
+                  "query": [
+                    { "key": "userId", "value": "", "disabled": true },
+                    { "key": "traceId", "value": "{{traceId}}", "disabled": true },
+                    { "key": "name", "value": "{{tenantSlug}}/latency-ms" }
+                  ]
+                },
+                "description": "Lista scores. Filtros: userId, traceId, name."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /langfuse/scores",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"traceId\": \"{{traceId}}\",\n  \"name\": \"{{tenantSlug}}/latency-ms\",\n  \"value\": 1234.5,\n  \"comment\": \"score escrito via Postman\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/scores",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "scores"]
+                },
+                "description": "Escreve score no Langfuse + gera audit_log (action=`score_written`). Trace precisa existir."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Metrics",
+          "item": [
+            {
+              "name": "GET /langfuse/metrics/daily",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/metrics/daily?userId={{tenantSlug}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "metrics", "daily"],
+                  "query": [
+                    { "key": "traceName", "value": "", "disabled": true },
+                    { "key": "userId", "value": "{{tenantSlug}}" },
+                    { "key": "tags", "value": "", "disabled": true },
+                    { "key": "fromTimestamp", "value": "2026-06-01T00:00:00Z", "disabled": true },
+                    { "key": "toTimestamp", "value": "2026-06-30T23:59:59Z", "disabled": true }
+                  ]
+                },
+                "description": "Métricas diárias agregadas. Filtros: traceName, userId, tags, fromTimestamp, toTimestamp."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Prompts",
+          "item": [
+            {
+              "name": "GET /langfuse/prompts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/prompts",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "prompts"]
+                },
+                "description": "Lista todos os prompts."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /langfuse/prompts",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tenantSlug\": \"{{tenantSlug}}\",\n  \"systemSlug\": \"{{systemSlug}}\",\n  \"agentSlug\": \"v1\",\n  \"name\": \"greeting\",\n  \"prompt\": \"Olá {{name}}! Como posso ajudar?\",\n  \"type\": \"text\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/prompts",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "prompts"]
+                },
+                "description": "Cria prompt. Aplica taxonomia (`buildPromptName`): nome canônico vira `{tenantSlug}/{systemSlug}/{agentSlug}/{name}`. Campos do observatory são removidos antes de mandar pro Langfuse. Gera audit_log (action=`prompt_published`)."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /langfuse/prompts/*name",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/prompts/{{promptName}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "prompts", "{{promptName}}"]
+                },
+                "description": "Detalhe do prompt por nome canônico (com barras). O nome em `promptName` é tipicamente `{tenant}/{system}/{agent}/{name}`."
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE /langfuse/prompts/*name",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/prompts/{{promptName}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "prompts", "{{promptName}}"]
+                },
+                "description": "Remove prompt. Retorna 204."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Score Configs",
+          "item": [
+            {
+              "name": "GET /langfuse/score-configs",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/score-configs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "score-configs"]
+                },
+                "description": "Lista score-configs."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /langfuse/score-configs",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tenantSlug\": \"{{tenantSlug}}\",\n  \"name\": \"latency-ms\",\n  \"dataType\": \"NUMERIC\",\n  \"description\": \"Latência da resposta em milissegundos\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/score-configs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "score-configs"]
+                },
+                "description": "Cria score-config. Aplica taxonomia (`buildScoreConfigName`): nome vira `{tenantSlug}/{name}`. NOTA: Langfuse v3 endureceu a regex de `name` e pode rejeitar nomes com `/` — issue conhecida."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Datasets",
+          "item": [
+            {
+              "name": "GET /langfuse/datasets",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/datasets",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "datasets"]
+                },
+                "description": "Lista datasets."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /langfuse/datasets",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"{{datasetName}}\",\n  \"description\": \"Conjunto de avaliação — exemplo\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/datasets",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "datasets"]
+                },
+                "description": "Cria dataset. Body é repassado verbatim pro Langfuse."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /langfuse/datasets/:name/items",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/datasets/{{datasetName}}/items",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "datasets", "{{datasetName}}", "items"]
+                },
+                "description": "Lista items do dataset."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /langfuse/datasets/:name/items",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"input\": { \"question\": \"O que é observabilidade?\" },\n  \"expectedOutput\": { \"answer\": \"Capacidade de entender o estado interno de um sistema a partir de seus outputs.\" }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/langfuse/datasets/{{datasetName}}/items",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["langfuse", "datasets", "{{datasetName}}", "items"]
+                },
+                "description": "Adiciona item ao dataset. Body é repassado verbatim pro Langfuse."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

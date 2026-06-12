@@ -44,6 +44,17 @@ pnpm lint         # eslint
 pnpm typecheck    # tsc --noEmit
 ```
 
+## Testar a API
+
+A coleção do Postman com **todas as rotas e dados fictícios** está versionada em [`postman/pulso-js.postman_collection.json`](postman/pulso-js.postman_collection.json). Importar no Postman: **Import → arraste o arquivo**. A coleção já vem com:
+
+- Header `x-api-key` configurado globalmente (lê do env var `apiKey` da coleção)
+- Variáveis prontas: `baseUrl`, `apiKey`, `tenantSlug`, `agentSlug`, `traceId`, etc.
+- Pastas organizadas por módulo: Health, Agents, Langfuse Proxy
+- Bodies de exemplo em todos os POSTs
+
+Atualizar a coleção quando criar uma rota nova é responsabilidade do PR — entra junto com o controller.
+
 ## Sensors no CI
 
 Type-check (`tsc --noEmit`) + lint (`eslint`) + testes (`vitest`). Falha em qualquer um bloqueia merge. Detalhes em `.github/workflows/ci.yml`.

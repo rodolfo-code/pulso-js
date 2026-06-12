@@ -27,3 +27,85 @@ model AuditLog {
   @@index([entityType, entityId])
   @@map("audit_log")
 }
+
+enum AgentStatus {
+  unknown
+  healthy
+  degraded
+  unhealthy
+
+  @@map("agent_status")
+}
+
+model Tenant {
+  id        String   @id @db.Uuid
+  slug      String   @unique
+  name      String
+  plan      String
+  createdAt DateTime @map("created_at")
+
+  systems System[]
+
+  @@map("tenants")
+}
+
+model System {
+  id        String   @id @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  slug      String
+  name      String
+  createdAt DateTime @map("created_at")
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  agents Agent[]
+
+  @@unique([tenantId, slug])
+  @@map("systems")
+}
+
+model Agent {
+  id               String      @id @db.Uuid
+  systemId         String      @map("system_id") @db.Uuid
+  slug             String      @unique
+  name             String
+  description      String
+  version          String
+  baseUrl          String      @map("base_url")
+  status           AgentStatus
+  lastHeartbeatAt  DateTime?   @map("last_heartbeat_at")
+  registeredAt     DateTime    @map("registered_at")
+
+  system                    System              @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  circuitBreakerStates      CircuitBreakerState[]
+  circuitBreakerTransitions CircuitBreakerTransition[]
+
+  @@map("agents")
+}
+
+model CircuitBreakerState {
+  agentId         String   @map("agent_id") @db.Uuid
+  name            String
+  state           String
+  failCount       Int      @map("fail_count")
+  lastStateChange DateTime? @map("last_state_change")
+  updatedAt       DateTime @map("updated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@id([agentId, name])
+  @@map("circuit_breaker_states")
+}
+
+model CircuitBreakerTransition {
+  id         String   @id @db.Uuid
+  agentId    String   @map("agent_id") @db.Uuid
+  cbName     String   @map("cb_name")
+  state      String
+  failCount  Int      @map("fail_count")
+  recordedAt DateTime @map("recorded_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, recordedAt])
+  @@map("circuit_breaker_transitions")
+}
