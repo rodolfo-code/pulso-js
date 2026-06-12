@@ -3,6 +3,7 @@ import { APP_PIPE } from "@nestjs/core";
 
 import { AgentsModule } from "./modules/agents/agents.module";
 import { HealthModule } from "./modules/health/health.module";
+import { IntelligenceModule } from "./modules/intelligence/intelligence.module";
 import { LangfuseProxyModule } from "./modules/langfuse-proxy/langfuse-proxy.module";
 import { AuthModule } from "./shared/auth/auth.module";
 import { ConfigModule } from "./shared/config/config.module";
@@ -21,7 +22,8 @@ import { RepositoriesModule } from "./shared/repositories/repositories.module";
     RepositoriesModule,
     HealthModule,
     LangfuseProxyModule,
-    AgentsModule
+    AgentsModule,
+    IntelligenceModule
   ],
   providers: [
     {

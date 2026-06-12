@@ -78,6 +78,8 @@ model Agent {
   system                    System              @relation(fields: [systemId], references: [id], onDelete: Cascade)
   circuitBreakerStates      CircuitBreakerState[]
   circuitBreakerTransitions CircuitBreakerTransition[]
+  healthScoreHistory        HealthScoreHistory[]
+  snapshots                 AgentSnapshot[]
 
   @@map("agents")
 }
@@ -108,4 +110,38 @@ model CircuitBreakerTransition {
 
   @@index([agentId, recordedAt])
   @@map("circuit_breaker_transitions")
+}
+
+model HealthScoreHistory {
+  id             String   @id @db.Uuid
+  agentId        String   @map("agent_id") @db.Uuid
+  score          Int
+  classification String
+  errorRate      Float    @map("error_rate")
+  avgLatencyMs   Int      @map("avg_latency_ms")
+  heartbeatAgeS  Int      @map("heartbeat_age_s")
+  calculatedAt   DateTime @map("calculated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, calculatedAt])
+  @@map("health_score_history")
+}
+
+model AgentSnapshot {
+  id           String   @id @db.Uuid
+  agentId      String   @map("agent_id") @db.Uuid
+  periodStart  DateTime @map("period_start")
+  periodEnd    DateTime @map("period_end")
+  totalTraces  Int      @map("total_traces")
+  errorCount   Int      @map("error_count")
+  avgLatencyMs Int      @map("avg_latency_ms")
+  p95LatencyMs Int      @map("p95_latency_ms")
+  totalCostUsd Decimal  @map("total_cost_usd") @db.Decimal(12, 4)
+  calculatedAt DateTime @map("calculated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, calculatedAt])
+  @@map("agent_snapshots")
 }

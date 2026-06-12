@@ -141,6 +141,39 @@
       ]
     },
     {
+      "name": "Intelligence",
+      "item": [
+        {
+          "name": "GET /intelligence/agents/:slug/health-score",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/intelligence/agents/{{agentSlug}}/health-score",
+              "host": ["{{baseUrl}}"],
+              "path": ["intelligence", "agents", "{{agentSlug}}", "health-score"]
+            },
+            "description": "Calcula o health score atual do agente combinando: KPIs dos traces do Langfuse (filtrados por metadata.agent = slug), idade do heartbeat e estado dos circuit breakers. Persiste o cálculo em health_score_history. Retorna 404 se o agente não existir."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /intelligence/agents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/intelligence/agents",
+              "host": ["{{baseUrl}}"],
+              "path": ["intelligence", "agents"]
+            },
+            "description": "Lista todos os agentes com seus health scores calculados em paralelo. Se algum agente falhar no cálculo, o item dele volta com healthScore: null (não derruba a lista inteira)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Langfuse Proxy",
       "item": [
         {
