@@ -1,28 +1,16 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 
+import type {
+  ConversationDetailDto,
+  EnrichedTraceDto
+} from "@/modules/observations/application/dtos/conversation-detail.dto";
 import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
 import { extractHierarchy } from "@/shared/domain/services/extract-hierarchy.service";
-import type { HierarchyFields } from "@/shared/domain/value-objects/hierarchy-fields.vo";
 import { LangfuseUpstreamError } from "@/shared/langfuse-client/errors/langfuse-upstream.error";
 import {
   ILangfuseClient,
   type LangfuseEntity
 } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
-
-export interface EnrichedTrace extends Record<string, unknown> {
-  hierarchy: {
-    tenantId: HierarchyFields["tenantId"];
-    system: HierarchyFields["system"];
-    agent: HierarchyFields["agent"];
-    userId: HierarchyFields["userId"];
-    sessionId: HierarchyFields["sessionId"];
-  };
-}
-
-export interface ConversationDetail {
-  session: LangfuseEntity;
-  traces: EnrichedTrace[];
-}
 
 @Injectable()
 export class GetConversationDetailUseCase {
@@ -32,7 +20,7 @@ export class GetConversationDetailUseCase {
     @Inject(ILangfuseClient) private readonly langfuse: ILangfuseClient
   ) {}
 
-  async execute(sessionId: string): Promise<ConversationDetail> {
+  async execute(sessionId: string): Promise<ConversationDetailDto> {
     let session: LangfuseEntity;
     try {
       session = await this.langfuse.getSession(sessionId);
@@ -56,7 +44,7 @@ export class GetConversationDetailUseCase {
       );
     }
 
-    const enrichedTraces: EnrichedTrace[] = traces.map((trace) => {
+    const enrichedTraces: EnrichedTraceDto[] = traces.map((trace) => {
       const h = extractHierarchy(trace);
       return {
         ...trace,

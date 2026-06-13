@@ -4,12 +4,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ComputeHealthScoreUseCase } from "@/modules/intelligence/application/use-cases/compute-health-score.use-case";
 import type { EnvConfig } from "@/shared/config/env.config";
 import { Agent } from "@/shared/domain/entities/agent.entity";
-import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
-import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
 import {
   BreakerState,
   CircuitBreakerState
-} from "@/shared/domain/value-objects/circuit-breaker-state.vo";
+} from "@/shared/domain/entities/circuit-breaker-state.entity";
+import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
+import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
 import { HealthClassification } from "@/shared/domain/value-objects/health-score.vo";
 import type { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import type { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";

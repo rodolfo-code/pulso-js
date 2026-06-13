@@ -3,17 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EvaluateSLOUseCase } from "@/modules/slos/application/use-cases/evaluate-slo.use-case";
 import type { EnvConfig } from "@/shared/config/env.config";
+import { AgentSnapshot } from "@/shared/domain/entities/agent-snapshot.entity";
 import { Agent } from "@/shared/domain/entities/agent.entity";
-import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
-import { AgentSnapshot } from "@/shared/domain/value-objects/agent-snapshot.vo";
-import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
 import {
   BreakerState,
   CircuitBreakerState
-} from "@/shared/domain/value-objects/circuit-breaker-state.vo";
-import { CircuitBreakerTransition } from "@/shared/domain/value-objects/circuit-breaker-transition.vo";
-import { SLODefinition, SLOOperator } from "@/shared/domain/value-objects/slo-definition.vo";
-import { SLOStatus } from "@/shared/domain/value-objects/slo-evaluation.vo";
+} from "@/shared/domain/entities/circuit-breaker-state.entity";
+import { CircuitBreakerTransition } from "@/shared/domain/entities/circuit-breaker-transition.entity";
+import { SLODefinition, SLOOperator } from "@/shared/domain/entities/slo-definition.entity";
+import { SLOStatus } from "@/shared/domain/entities/slo-evaluation.entity";
+import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
+import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
 import type { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import type { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
 import type { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";

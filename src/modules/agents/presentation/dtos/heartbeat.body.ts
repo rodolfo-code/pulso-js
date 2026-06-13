@@ -10,7 +10,7 @@ import {
   ValidateNested
 } from "class-validator";
 
-import { BreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
+import { BreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
 
 export class CircuitBreakerBody {
   @IsString()

@@ -1,10 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 
 import { Agent } from "@/shared/domain/entities/agent.entity";
+import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
 import { System } from "@/shared/domain/entities/system.entity";
 import { Tenant } from "@/shared/domain/entities/tenant.entity";
 import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
-import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
 import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
 import { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
 

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 
-import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
+import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
 import { PrismaService } from "@/shared/prisma/prisma.service";
 
 import { IAuditLogRepo } from "./interfaces/audit-log-repo.interface";

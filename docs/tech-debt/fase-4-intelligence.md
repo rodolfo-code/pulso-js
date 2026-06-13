@@ -57,7 +57,7 @@ Recomendação: **B** — usar a tabela `agent_snapshots` que já criamos para e
 ## 3. `totalCostUsd` como `number` em JS (perda potencial de precisão)
 
 **Onde:**
-- VO [`agent-snapshot.vo.ts`](../../src/shared/domain/value-objects/agent-snapshot.vo.ts)
+- VO [`agent-snapshot.vo.ts`](../../src/shared/domain/entities/agent-snapshot.entity.ts)
 - VO [`kpi-result.vo.ts`](../../src/shared/domain/value-objects/kpi-result.vo.ts)
 - Mapper [`agent-snapshot.mapper.ts`](../../src/shared/repositories/mappers/agent-snapshot.mapper.ts) — `Number(row.totalCostUsd)`
 

@@ -12,8 +12,8 @@ import { ListSLOsUseCase } from "@/modules/slos/application/use-cases/list-slos.
 import { SLOsController } from "@/modules/slos/presentation/controllers/slos.controller";
 import type { EnvConfig } from "@/shared/config/env.config";
 import { Agent } from "@/shared/domain/entities/agent.entity";
+import { SLODefinition, SLOOperator } from "@/shared/domain/entities/slo-definition.entity";
 import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
-import { SLODefinition, SLOOperator } from "@/shared/domain/value-objects/slo-definition.vo";
 import { DomainExceptionFilter } from "@/shared/http/filters/domain-exception.filter";
 import type { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import type { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";

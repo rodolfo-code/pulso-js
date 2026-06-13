@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 
 import { ScoreDto } from "@/modules/langfuse-proxy/application/dtos/score.dto";
-import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
+import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
 import {
   ILangfuseClient,
   type LangfuseEntity

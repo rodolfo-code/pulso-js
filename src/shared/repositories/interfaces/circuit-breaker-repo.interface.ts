@@ -1,5 +1,5 @@
-import type { CircuitBreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
-import type { CircuitBreakerTransition } from "@/shared/domain/value-objects/circuit-breaker-transition.vo";
+import type { CircuitBreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
+import type { CircuitBreakerTransition } from "@/shared/domain/entities/circuit-breaker-transition.entity";
 
 export abstract class ICircuitBreakerRepo {
   abstract listByAgent(agentId: string): Promise<CircuitBreakerState[]>;

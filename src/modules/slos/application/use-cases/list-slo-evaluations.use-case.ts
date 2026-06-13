@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
+import type { SLOEvaluation } from "@/shared/domain/entities/slo-evaluation.entity";
 import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
-import type { SLOEvaluation } from "@/shared/domain/value-objects/slo-evaluation.vo";
 import { ISLORepo } from "@/shared/repositories/interfaces/slo-repo.interface";
 
 @Injectable()

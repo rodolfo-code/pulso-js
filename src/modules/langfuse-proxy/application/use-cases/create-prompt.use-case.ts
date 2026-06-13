@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 
 import { PromptDto } from "@/modules/langfuse-proxy/application/dtos/prompt.dto";
+import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
 import { buildPromptName } from "@/shared/domain/services/taxonomy";
-import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
 import {
   ILangfuseClient,
   type LangfuseEntity

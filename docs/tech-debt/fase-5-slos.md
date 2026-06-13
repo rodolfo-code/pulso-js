@@ -9,8 +9,8 @@ Status: aceitos pra fechar a fase, marcados como dívida.
 ## 1. `threshold` e `measuredValue` como `number` (perda potencial de precisão)
 
 **Onde:**
-- VO [`slo-definition.vo.ts`](../../src/shared/domain/value-objects/slo-definition.vo.ts) — `threshold: number`
-- VO [`slo-evaluation.vo.ts`](../../src/shared/domain/value-objects/slo-evaluation.vo.ts) — `measuredValue: number | null`
+- VO [`slo-definition.vo.ts`](../../src/shared/domain/entities/slo-definition.entity.ts) — `threshold: number`
+- VO [`slo-evaluation.vo.ts`](../../src/shared/domain/entities/slo-evaluation.entity.ts) — `measuredValue: number | null`
 - Mappers [`slo-definition.mapper.ts`](../../src/shared/repositories/mappers/slo-definition.mapper.ts) e [`slo-evaluation.mapper.ts`](../../src/shared/repositories/mappers/slo-evaluation.mapper.ts) — `Number(row.threshold)` / `Number(row.measuredValue)`
 
 **O que acontece:** Schema Prisma usa `Decimal(20, 6)` (precisão preservada no Postgres), mas as entidades em memória usam `number` (float64 JS).

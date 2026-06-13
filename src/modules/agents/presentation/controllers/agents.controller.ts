@@ -8,10 +8,8 @@ import {
   Post
 } from "@nestjs/common";
 
-import {
-  AgentStatusView,
-  GetAgentStatusUseCase
-} from "@/modules/agents/application/use-cases/get-agent-status.use-case";
+import type { AgentStatusViewDto } from "@/modules/agents/application/dtos/agent-status-view.dto";
+import { GetAgentStatusUseCase } from "@/modules/agents/application/use-cases/get-agent-status.use-case";
 import { GetAgentUseCase } from "@/modules/agents/application/use-cases/get-agent.use-case";
 import { ListAgentCircuitBreakersUseCase } from "@/modules/agents/application/use-cases/list-agent-circuit-breakers.use-case";
 import { ListAgentsUseCase } from "@/modules/agents/application/use-cases/list-agents.use-case";
@@ -20,7 +18,7 @@ import { RegisterAgentUseCase } from "@/modules/agents/application/use-cases/reg
 import { HeartbeatBody } from "@/modules/agents/presentation/dtos/heartbeat.body";
 import { RegisterAgentBody } from "@/modules/agents/presentation/dtos/register-agent.body";
 import type { Agent } from "@/shared/domain/entities/agent.entity";
-import type { CircuitBreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
+import type { CircuitBreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
 
 @Controller("agents")
 export class AgentsController {
@@ -72,7 +70,7 @@ export class AgentsController {
   }
 
   @Get(":slug/status")
-  getStatus(@Param("slug") slug: string): Promise<AgentStatusView> {
+  getStatus(@Param("slug") slug: string): Promise<AgentStatusViewDto> {
     return this.getAgentStatus.execute(slug);
   }
 

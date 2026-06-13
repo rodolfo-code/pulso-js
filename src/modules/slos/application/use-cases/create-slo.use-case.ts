@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import {
   SLODefinition,
   type SLOOperator
-} from "@/shared/domain/value-objects/slo-definition.vo";
+} from "@/shared/domain/entities/slo-definition.entity";
 import { ISLORepo } from "@/shared/repositories/interfaces/slo-repo.interface";
 
 export interface CreateSLORequest {

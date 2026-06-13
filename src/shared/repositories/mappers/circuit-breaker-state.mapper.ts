@@ -1,7 +1,7 @@
 import {
   BreakerState,
   CircuitBreakerState
-} from "@/shared/domain/value-objects/circuit-breaker-state.vo";
+} from "@/shared/domain/entities/circuit-breaker-state.entity";
 
 interface CircuitBreakerStateRow {
   agentId: string;

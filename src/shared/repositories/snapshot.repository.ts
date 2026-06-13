@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import { AgentSnapshot } from "@/shared/domain/value-objects/agent-snapshot.vo";
+import { AgentSnapshot } from "@/shared/domain/entities/agent-snapshot.entity";
 import { PrismaService } from "@/shared/prisma/prisma.service";
 
 import { ISnapshotRepo } from "./interfaces/snapshot-repo.interface";

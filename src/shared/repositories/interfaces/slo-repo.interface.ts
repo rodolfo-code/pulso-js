@@ -1,5 +1,5 @@
-import type { SLODefinition } from "@/shared/domain/value-objects/slo-definition.vo";
-import type { SLOEvaluation } from "@/shared/domain/value-objects/slo-evaluation.vo";
+import type { SLODefinition } from "@/shared/domain/entities/slo-definition.entity";
+import type { SLOEvaluation } from "@/shared/domain/entities/slo-evaluation.entity";
 
 export abstract class ISLORepo {
   abstract createSlo(slo: SLODefinition): Promise<SLODefinition>;

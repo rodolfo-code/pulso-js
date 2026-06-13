@@ -3,11 +3,11 @@ import { ConfigService } from "@nestjs/config";
 
 import type { EnvConfig } from "@/shared/config/env.config";
 import { Agent } from "@/shared/domain/entities/agent.entity";
+import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
+import { CircuitBreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
+import { CircuitBreakerTransition } from "@/shared/domain/entities/circuit-breaker-transition.entity";
 import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
 import { computeStatus } from "@/shared/domain/services/status-engine.service";
-import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
-import { CircuitBreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
-import { CircuitBreakerTransition } from "@/shared/domain/value-objects/circuit-breaker-transition.vo";
 import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
 import { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
 import { ICircuitBreakerRepo } from "@/shared/repositories/interfaces/circuit-breaker-repo.interface";

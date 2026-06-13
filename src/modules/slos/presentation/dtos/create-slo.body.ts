@@ -1,6 +1,6 @@
 import { IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsString, IsUUID, Min } from "class-validator";
 
-import { SLOOperator } from "@/shared/domain/value-objects/slo-definition.vo";
+import { SLOOperator } from "@/shared/domain/entities/slo-definition.entity";
 
 export class CreateSLOBody {
   @IsUUID()

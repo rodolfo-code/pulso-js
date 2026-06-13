@@ -1,6 +1,6 @@
+import { BreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
+import type { CircuitBreakerTransition } from "@/shared/domain/entities/circuit-breaker-transition.entity";
 import { CBMetrics } from "@/shared/domain/value-objects/cb-metrics.vo";
-import { BreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
-import type { CircuitBreakerTransition } from "@/shared/domain/value-objects/circuit-breaker-transition.vo";
 
 /**
  * Calcula métricas SLO de Circuit Breaker a partir de uma série temporal de

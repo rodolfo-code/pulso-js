@@ -2,6 +2,10 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import type { EnvConfig } from "@/shared/config/env.config";
+import type { AgentSnapshot } from "@/shared/domain/entities/agent-snapshot.entity";
+import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
+import type { SLODefinition } from "@/shared/domain/entities/slo-definition.entity";
+import { SLOEvaluation, SLOStatus } from "@/shared/domain/entities/slo-evaluation.entity";
 import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
 import { calculateCbMetrics } from "@/shared/domain/services/cb-metrics.service";
 import { extractHierarchy } from "@/shared/domain/services/extract-hierarchy.service";
@@ -12,11 +16,7 @@ import {
   isCbMetric,
   parseCbMetric
 } from "@/shared/domain/services/slo-evaluator.service";
-import type { AgentSnapshot } from "@/shared/domain/value-objects/agent-snapshot.vo";
-import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
 import { KPIResult } from "@/shared/domain/value-objects/kpi-result.vo";
-import type { SLODefinition } from "@/shared/domain/value-objects/slo-definition.vo";
-import { SLOEvaluation, SLOStatus } from "@/shared/domain/value-objects/slo-evaluation.vo";
 import { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
 import { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";

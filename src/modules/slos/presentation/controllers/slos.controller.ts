@@ -14,8 +14,8 @@ import { EvaluateSLOUseCase } from "@/modules/slos/application/use-cases/evaluat
 import { ListSLOEvaluationsUseCase } from "@/modules/slos/application/use-cases/list-slo-evaluations.use-case";
 import { ListSLOsUseCase } from "@/modules/slos/application/use-cases/list-slos.use-case";
 import { CreateSLOBody } from "@/modules/slos/presentation/dtos/create-slo.body";
-import type { SLODefinition } from "@/shared/domain/value-objects/slo-definition.vo";
-import type { SLOEvaluation } from "@/shared/domain/value-objects/slo-evaluation.vo";
+import type { SLODefinition } from "@/shared/domain/entities/slo-definition.entity";
+import type { SLOEvaluation } from "@/shared/domain/entities/slo-evaluation.entity";
 
 @Controller("slos")
 export class SLOsController {

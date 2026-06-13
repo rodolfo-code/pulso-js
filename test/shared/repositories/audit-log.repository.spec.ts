@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
+import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
 import type { PrismaService } from "@/shared/prisma/prisma.service";
 import { AuditLogRepository } from "@/shared/repositories/audit-log.repository";
 

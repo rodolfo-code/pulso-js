@@ -1,4 +1,4 @@
-import type { AgentSnapshot } from "@/shared/domain/value-objects/agent-snapshot.vo";
+import type { AgentSnapshot } from "@/shared/domain/entities/agent-snapshot.entity";
 
 export abstract class ISnapshotRepo {
   abstract createSnapshot(snapshot: AgentSnapshot): Promise<AgentSnapshot>;

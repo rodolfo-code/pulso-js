@@ -4,7 +4,7 @@ import { CreateSLOUseCase } from "@/modules/slos/application/use-cases/create-sl
 import {
   type SLODefinition,
   SLOOperator
-} from "@/shared/domain/value-objects/slo-definition.vo";
+} from "@/shared/domain/entities/slo-definition.entity";
 import type { ISLORepo } from "@/shared/repositories/interfaces/slo-repo.interface";
 
 const AGENT_ID = "00000000-0000-4000-8000-000000000070";

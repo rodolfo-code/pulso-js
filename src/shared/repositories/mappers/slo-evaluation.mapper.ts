@@ -1,4 +1,4 @@
-import { SLOEvaluation, SLOStatus } from "@/shared/domain/value-objects/slo-evaluation.vo";
+import { SLOEvaluation, SLOStatus } from "@/shared/domain/entities/slo-evaluation.entity";
 import type { Prisma } from "@prisma-client/client";
 
 interface SLOEvaluationRowRead {

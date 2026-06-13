@@ -1,4 +1,4 @@
-import { HealthScoreRecord } from "@/shared/domain/value-objects/health-score-record.vo";
+import { HealthScoreRecord } from "@/shared/domain/entities/health-score-record.entity";
 import {
   HealthClassification,
   type HealthClassification as HealthClassificationType

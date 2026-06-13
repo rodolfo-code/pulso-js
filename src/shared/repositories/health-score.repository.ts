@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import { HealthScoreRecord } from "@/shared/domain/value-objects/health-score-record.vo";
+import { HealthScoreRecord } from "@/shared/domain/entities/health-score-record.entity";
 import { PrismaService } from "@/shared/prisma/prisma.service";
 
 import { IHealthScoreRepo } from "./interfaces/health-score-repo.interface";

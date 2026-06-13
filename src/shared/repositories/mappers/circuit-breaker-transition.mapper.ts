@@ -1,5 +1,5 @@
-import { BreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
-import { CircuitBreakerTransition } from "@/shared/domain/value-objects/circuit-breaker-transition.vo";
+import { BreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
+import { CircuitBreakerTransition } from "@/shared/domain/entities/circuit-breaker-transition.entity";
 
 interface CircuitBreakerTransitionRow {
   id: string;

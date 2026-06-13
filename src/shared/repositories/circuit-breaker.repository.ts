@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
-import { CircuitBreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
-import { CircuitBreakerTransition } from "@/shared/domain/value-objects/circuit-breaker-transition.vo";
+import { CircuitBreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
+import { CircuitBreakerTransition } from "@/shared/domain/entities/circuit-breaker-transition.entity";
 import { PrismaService } from "@/shared/prisma/prisma.service";
 
 import { ICircuitBreakerRepo } from "./interfaces/circuit-breaker-repo.interface";

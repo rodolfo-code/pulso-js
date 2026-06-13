@@ -1,4 +1,4 @@
-import { AgentSnapshot } from "@/shared/domain/value-objects/agent-snapshot.vo";
+import { AgentSnapshot } from "@/shared/domain/entities/agent-snapshot.entity";
 import type { Prisma } from "@prisma-client/client";
 
 interface AgentSnapshotRowRead {

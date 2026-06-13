@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
+import { SLOOperator } from "@/shared/domain/entities/slo-definition.entity";
 import {
   evaluateOperator,
   extractMetric,
@@ -8,7 +9,6 @@ import {
   parseCbMetric
 } from "@/shared/domain/services/slo-evaluator.service";
 import { KPIResult } from "@/shared/domain/value-objects/kpi-result.vo";
-import { SLOOperator } from "@/shared/domain/value-objects/slo-definition.vo";
 
 describe("evaluateOperator", () => {
   it("lte: measured <= threshold", () => {

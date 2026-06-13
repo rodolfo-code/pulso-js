@@ -1,25 +1,12 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 
+import type { ClientOverviewDto } from "@/modules/observations/application/dtos/client-overview.dto";
 import { extractHierarchy } from "@/shared/domain/services/extract-hierarchy.service";
 import {
   ILangfuseClient,
   type LangfuseFilters
 } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
-
-export interface ClientOverview {
-  userId: string;
-  tenantId: string;
-  system: string;
-  agent: {
-    slug: string;
-    name: string;
-    status: string;
-    version: string;
-  } | null;
-  traceCount: number;
-  traceIds: (string | null)[];
-}
 
 @Injectable()
 export class GetClientOverviewUseCase {
@@ -30,7 +17,7 @@ export class GetClientOverviewUseCase {
     @Inject(ILangfuseClient) private readonly langfuse: ILangfuseClient
   ) {}
 
-  async execute(filters?: LangfuseFilters): Promise<ClientOverview[]> {
+  async execute(filters?: LangfuseFilters): Promise<ClientOverviewDto[]> {
     const agents = await this.agentRepo.listAgents();
     const agentMap = new Map(agents.map((a) => [a.slug, a]));
 
@@ -44,7 +31,7 @@ export class GetClientOverviewUseCase {
       );
     }
 
-    const clients = new Map<string, ClientOverview>();
+    const clients = new Map<string, ClientOverviewDto>();
 
     for (const trace of traces) {
       const h = extractHierarchy(trace);

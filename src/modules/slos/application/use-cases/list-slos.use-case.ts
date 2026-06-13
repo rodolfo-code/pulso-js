@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import type { SLODefinition } from "@/shared/domain/value-objects/slo-definition.vo";
+import type { SLODefinition } from "@/shared/domain/entities/slo-definition.entity";
 import { ISLORepo } from "@/shared/repositories/interfaces/slo-repo.interface";
 
 @Injectable()

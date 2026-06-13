@@ -1,9 +1,9 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
+import { BreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
+import { CircuitBreakerTransition } from "@/shared/domain/entities/circuit-breaker-transition.entity";
 import { calculateCbMetrics } from "@/shared/domain/services/cb-metrics.service";
-import { BreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
-import { CircuitBreakerTransition } from "@/shared/domain/value-objects/circuit-breaker-transition.vo";
 
 const WINDOW_START = new Date("2026-06-01T00:00:00.000Z");
 const WINDOW_END = new Date("2026-06-01T01:00:00.000Z"); // 1h window

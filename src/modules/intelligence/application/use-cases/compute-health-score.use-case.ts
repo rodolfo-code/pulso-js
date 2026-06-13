@@ -2,12 +2,12 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
 import type { EnvConfig } from "@/shared/config/env.config";
+import { BreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
+import { HealthScoreRecord } from "@/shared/domain/entities/health-score-record.entity";
 import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
 import { extractHierarchy } from "@/shared/domain/services/extract-hierarchy.service";
 import { computeHealthScore } from "@/shared/domain/services/health-score.service";
 import { calculateKpis } from "@/shared/domain/services/kpi-calculator.service";
-import { BreakerState } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
-import { HealthScoreRecord } from "@/shared/domain/value-objects/health-score-record.vo";
 import type { HealthScore } from "@/shared/domain/value-objects/health-score.vo";
 import { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";

@@ -1,4 +1,4 @@
-import { SLODefinition, SLOOperator } from "@/shared/domain/value-objects/slo-definition.vo";
+import { SLODefinition, SLOOperator } from "@/shared/domain/entities/slo-definition.entity";
 import type { Prisma } from "@prisma-client/client";
 
 interface SLODefinitionRowRead {

@@ -1,4 +1,4 @@
-import type { HealthClassification } from "./health-score.vo";
+import type { HealthClassification } from "../value-objects/health-score.vo";
 
 export class HealthScoreRecord {
   constructor(

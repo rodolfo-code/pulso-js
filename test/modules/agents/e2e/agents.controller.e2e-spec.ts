@@ -14,13 +14,13 @@ import { RegisterAgentUseCase } from "@/modules/agents/application/use-cases/reg
 import { AgentsController } from "@/modules/agents/presentation/controllers/agents.controller";
 import type { EnvConfig } from "@/shared/config/env.config";
 import { Agent } from "@/shared/domain/entities/agent.entity";
-import type { System } from "@/shared/domain/entities/system.entity";
-import type { Tenant } from "@/shared/domain/entities/tenant.entity";
-import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
 import {
   BreakerState,
   CircuitBreakerState
-} from "@/shared/domain/value-objects/circuit-breaker-state.vo";
+} from "@/shared/domain/entities/circuit-breaker-state.entity";
+import type { System } from "@/shared/domain/entities/system.entity";
+import type { Tenant } from "@/shared/domain/entities/tenant.entity";
+import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
 import { DomainExceptionFilter } from "@/shared/http/filters/domain-exception.filter";
 import type { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
 import type { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";

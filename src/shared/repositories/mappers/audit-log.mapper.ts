@@ -1,4 +1,4 @@
-import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
+import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
 import type { Prisma } from "@prisma-client/client";
 
 interface AuditLogRowRead {

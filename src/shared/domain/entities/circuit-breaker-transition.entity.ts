@@ -1,4 +1,4 @@
-import type { BreakerState } from "./circuit-breaker-state.vo";
+import type { BreakerState } from "./circuit-breaker-state.entity";
 
 export class CircuitBreakerTransition {
   constructor(

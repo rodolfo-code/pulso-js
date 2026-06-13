@@ -1,5 +1,5 @@
+import { SLOOperator } from "@/shared/domain/entities/slo-definition.entity";
 import type { KPIResult } from "@/shared/domain/value-objects/kpi-result.vo";
-import { SLOOperator } from "@/shared/domain/value-objects/slo-definition.vo";
 
 const CB_METRICS = new Set<string>([
   "cb_open_duration_minutes",

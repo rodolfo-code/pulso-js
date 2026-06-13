@@ -1,14 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 
+import type { AgentWithHealthScoreDto } from "@/modules/intelligence/application/dtos/agent-with-health-score.dto";
 import { ComputeHealthScoreUseCase } from "@/modules/intelligence/application/use-cases/compute-health-score.use-case";
-import type { Agent } from "@/shared/domain/entities/agent.entity";
-import type { HealthScore } from "@/shared/domain/value-objects/health-score.vo";
 import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
-
-export interface AgentWithHealthScore {
-  agent: Agent;
-  healthScore: HealthScore | null;
-}
 
 @Injectable()
 export class ListAgentsWithHealthScoresUseCase {
@@ -19,7 +13,7 @@ export class ListAgentsWithHealthScoresUseCase {
     private readonly computeHealthScore: ComputeHealthScoreUseCase
   ) {}
 
-  async execute(): Promise<AgentWithHealthScore[]> {
+  async execute(): Promise<AgentWithHealthScoreDto[]> {
     const agents = await this.agentRepo.listAgents();
     return Promise.all(
       agents.map(async (agent) => {

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
-import { SLODefinition } from "@/shared/domain/value-objects/slo-definition.vo";
-import { SLOEvaluation } from "@/shared/domain/value-objects/slo-evaluation.vo";
+import { SLODefinition } from "@/shared/domain/entities/slo-definition.entity";
+import { SLOEvaluation } from "@/shared/domain/entities/slo-evaluation.entity";
 import { PrismaService } from "@/shared/prisma/prisma.service";
 
 import { ISLORepo } from "./interfaces/slo-repo.interface";
