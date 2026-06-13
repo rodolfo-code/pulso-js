@@ -7,6 +7,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 
 import { CreateSLOUseCase } from "@/modules/slos/application/use-cases/create-slo.use-case";
 import { EvaluateSLOUseCase } from "@/modules/slos/application/use-cases/evaluate-slo.use-case";
+import { ListSLOEvaluationsUseCase } from "@/modules/slos/application/use-cases/list-slo-evaluations.use-case";
+import { ListSLOsUseCase } from "@/modules/slos/application/use-cases/list-slos.use-case";
 import { SLOsController } from "@/modules/slos/presentation/controllers/slos.controller";
 import type { EnvConfig } from "@/shared/config/env.config";
 import { Agent } from "@/shared/domain/entities/agent.entity";
@@ -14,10 +16,10 @@ import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
 import { SLODefinition, SLOOperator } from "@/shared/domain/value-objects/slo-definition.vo";
 import { DomainExceptionFilter } from "@/shared/http/filters/domain-exception.filter";
 import type { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
-import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
+import type { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
 import type { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
 import type { ICircuitBreakerRepo } from "@/shared/repositories/interfaces/circuit-breaker-repo.interface";
-import { ISLORepo } from "@/shared/repositories/interfaces/slo-repo.interface";
+import type { ISLORepo } from "@/shared/repositories/interfaces/slo-repo.interface";
 import type { ISnapshotRepo } from "@/shared/repositories/interfaces/snapshot-repo.interface";
 
 const AGENT_ID = "00000000-0000-4000-8000-000000000100";
@@ -100,14 +102,18 @@ describe("SLOsController (e2e)", () => {
       fakeCbRepo as unknown as ICircuitBreakerRepo,
       fakeConfig
     );
+    const listSlosUseCase = new ListSLOsUseCase(fakeSloRepo as unknown as ISLORepo);
+    const listSloEvaluationsUseCase = new ListSLOEvaluationsUseCase(
+      fakeSloRepo as unknown as ISLORepo
+    );
 
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [SLOsController],
       providers: [
         { provide: CreateSLOUseCase, useValue: createSloUseCase },
         { provide: EvaluateSLOUseCase, useValue: evaluateSloUseCase },
-        { provide: ISLORepo, useValue: fakeSloRepo },
-        { provide: IAgentRepo, useValue: fakeAgentRepo }
+        { provide: ListSLOsUseCase, useValue: listSlosUseCase },
+        { provide: ListSLOEvaluationsUseCase, useValue: listSloEvaluationsUseCase }
       ]
     }).compile();
 

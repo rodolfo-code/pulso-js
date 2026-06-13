@@ -82,10 +82,39 @@ export default [
       "no-console": ["warn", { allow: ["warn", "error"] }]
     }
   },
+  // ───────────────────────────────────────────────────────────────────────
+  // REGRA ARQUITETURAL: controllers (presentation) NÃO podem importar
+  // infraestrutura (repositórios, langfuse-client, prisma) — nem interfaces,
+  // nem implementações. Pra acessar dados, criar use case em application/.
+  // Ver GOLDEN_RULES.md regra #3 e docs/architecture.md.
+  // ───────────────────────────────────────────────────────────────────────
+  {
+    files: ["src/modules/*/presentation/**/*.ts"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        patterns: [
+          {
+            group: [
+              "**/shared/repositories/**",
+              "**/shared/langfuse-client/**",
+              "**/shared/prisma/**",
+              "@/shared/repositories/**",
+              "@/shared/langfuse-client/**",
+              "@/shared/prisma/**"
+            ],
+            message: "Controllers/DTOs não podem importar infraestrutura (repositórios, langfuse-client, prisma). Pra acessar dados, crie um use case em application/use-cases/ e injete-o no controller. Ver GOLDEN_RULES.md.",
+            // Type-only imports (`import type {...}`) são permitidos: shapes não acessam infra.
+            allowTypeImports: true
+          }
+        ]
+      }]
+    }
+  },
   {
     files: ["test/**/*.ts"],
     rules: {
-      "boundaries/element-types": "off"
+      "boundaries/element-types": "off",
+      "no-restricted-imports": "off"
     }
   }
 ];

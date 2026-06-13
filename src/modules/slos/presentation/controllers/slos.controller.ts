@@ -11,18 +11,19 @@ import {
 
 import { CreateSLOUseCase } from "@/modules/slos/application/use-cases/create-slo.use-case";
 import { EvaluateSLOUseCase } from "@/modules/slos/application/use-cases/evaluate-slo.use-case";
+import { ListSLOEvaluationsUseCase } from "@/modules/slos/application/use-cases/list-slo-evaluations.use-case";
+import { ListSLOsUseCase } from "@/modules/slos/application/use-cases/list-slos.use-case";
 import { CreateSLOBody } from "@/modules/slos/presentation/dtos/create-slo.body";
-import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
 import type { SLODefinition } from "@/shared/domain/value-objects/slo-definition.vo";
 import type { SLOEvaluation } from "@/shared/domain/value-objects/slo-evaluation.vo";
-import { ISLORepo } from "@/shared/repositories/interfaces/slo-repo.interface";
 
 @Controller("slos")
 export class SLOsController {
   constructor(
     private readonly createSlo: CreateSLOUseCase,
     private readonly evaluateSlo: EvaluateSLOUseCase,
-    private readonly sloRepo: ISLORepo
+    private readonly listSlosUseCase: ListSLOsUseCase,
+    private readonly listSloEvaluations: ListSLOEvaluationsUseCase
   ) {}
 
   @Post()
@@ -40,7 +41,7 @@ export class SLOsController {
 
   @Get()
   list(): Promise<SLODefinition[]> {
-    return this.sloRepo.listSlos();
+    return this.listSlosUseCase.execute();
   }
 
   @Post(":id/evaluate")
@@ -50,13 +51,7 @@ export class SLOsController {
   }
 
   @Get(":id/evaluations")
-  async listEvaluations(
-    @Param("id", new ParseUUIDPipe()) id: string
-  ): Promise<SLOEvaluation[]> {
-    const slo = await this.sloRepo.getSlo(id);
-    if (slo === null) {
-      throw new DomainNotFoundError(`SLO not found: ${id}`);
-    }
-    return this.sloRepo.listEvaluations(id);
+  listEvaluations(@Param("id", new ParseUUIDPipe()) id: string): Promise<SLOEvaluation[]> {
+    return this.listSloEvaluations.execute(id);
   }
 }

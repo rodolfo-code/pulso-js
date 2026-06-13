@@ -1,9 +1,9 @@
-import { Controller, Get, Logger, Param } from "@nestjs/common";
+import { Controller, Get, Param } from "@nestjs/common";
 
 import { ComputeHealthScoreUseCase } from "@/modules/intelligence/application/use-cases/compute-health-score.use-case";
-import { Agent } from "@/shared/domain/entities/agent.entity";
+import { ListAgentsWithHealthScoresUseCase } from "@/modules/intelligence/application/use-cases/list-agents-with-health-scores.use-case";
+import type { Agent } from "@/shared/domain/entities/agent.entity";
 import type { HealthClassification } from "@/shared/domain/value-objects/health-score.vo";
-import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
 
 interface HealthScoreResponse {
   agentSlug: string;
@@ -24,11 +24,9 @@ interface AgentWithHealthScoreResponse {
 
 @Controller("intelligence")
 export class IntelligenceController {
-  private readonly logger = new Logger(IntelligenceController.name);
-
   constructor(
     private readonly computeHealthScore: ComputeHealthScoreUseCase,
-    private readonly agentRepo: IAgentRepo
+    private readonly listAgentsWithHealthScores: ListAgentsWithHealthScoresUseCase
   ) {}
 
   @Get("agents/:slug/health-score")
@@ -48,34 +46,24 @@ export class IntelligenceController {
   }
 
   @Get("agents")
-  async listAgentsWithHealthScores(): Promise<AgentWithHealthScoreResponse[]> {
-    const agents = await this.agentRepo.listAgents();
-    return Promise.all(
-      agents.map(async (agent) => {
-        try {
-          const health = await this.computeHealthScore.execute(agent.slug);
-          return {
-            agent,
-            healthScore: {
+  async list(): Promise<AgentWithHealthScoreResponse[]> {
+    const items = await this.listAgentsWithHealthScores.execute();
+    return items.map(({ agent, healthScore }) => ({
+      agent,
+      healthScore:
+        healthScore === null
+          ? null
+          : {
               agentSlug: agent.slug,
-              score: health.score,
-              classification: health.classification,
-              errorRate: health.errorRate,
-              avgLatencyMs: health.avgLatencyMs,
-              heartbeatAgeS: health.heartbeatAgeS,
-              cbOpenCount: health.cbOpenCount,
-              cbHalfOpenCount: health.cbHalfOpenCount,
+              score: healthScore.score,
+              classification: healthScore.classification,
+              errorRate: healthScore.errorRate,
+              avgLatencyMs: healthScore.avgLatencyMs,
+              heartbeatAgeS: healthScore.heartbeatAgeS,
+              cbOpenCount: healthScore.cbOpenCount,
+              cbHalfOpenCount: healthScore.cbHalfOpenCount,
               calculatedAt: new Date()
             }
-          };
-        } catch (error) {
-          this.logger.warn(
-            `Failed to compute health score for agent=${agent.slug}`,
-            error instanceof Error ? error.stack : error
-          );
-          return { agent, healthScore: null };
-        }
-      })
-    );
+    }));
   }
 }

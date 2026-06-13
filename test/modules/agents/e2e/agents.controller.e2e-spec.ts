@@ -5,6 +5,10 @@ import { Test, type TestingModule } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { GetAgentStatusUseCase } from "@/modules/agents/application/use-cases/get-agent-status.use-case";
+import { GetAgentUseCase } from "@/modules/agents/application/use-cases/get-agent.use-case";
+import { ListAgentCircuitBreakersUseCase } from "@/modules/agents/application/use-cases/list-agent-circuit-breakers.use-case";
+import { ListAgentsUseCase } from "@/modules/agents/application/use-cases/list-agents.use-case";
 import { ProcessHeartbeatUseCase } from "@/modules/agents/application/use-cases/process-heartbeat.use-case";
 import { RegisterAgentUseCase } from "@/modules/agents/application/use-cases/register-agent.use-case";
 import { AgentsController } from "@/modules/agents/presentation/controllers/agents.controller";
@@ -18,9 +22,9 @@ import {
   CircuitBreakerState
 } from "@/shared/domain/value-objects/circuit-breaker-state.vo";
 import { DomainExceptionFilter } from "@/shared/http/filters/domain-exception.filter";
-import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
-import { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
-import { ICircuitBreakerRepo } from "@/shared/repositories/interfaces/circuit-breaker-repo.interface";
+import type { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
+import type { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
+import type { ICircuitBreakerRepo } from "@/shared/repositories/interfaces/circuit-breaker-repo.interface";
 
 const SYSTEM_ID = "00000000-0000-4000-8000-000000000011";
 
@@ -92,15 +96,26 @@ describe("AgentsController (e2e)", () => {
       fakeCbRepo as unknown as ICircuitBreakerRepo,
       fakeConfig
     );
+    const listAgents = new ListAgentsUseCase(fakeAgentRepo as unknown as IAgentRepo);
+    const getAgent = new GetAgentUseCase(fakeAgentRepo as unknown as IAgentRepo);
+    const getAgentStatus = new GetAgentStatusUseCase(
+      getAgent,
+      fakeCbRepo as unknown as ICircuitBreakerRepo
+    );
+    const listAgentCircuitBreakers = new ListAgentCircuitBreakersUseCase(
+      getAgent,
+      fakeCbRepo as unknown as ICircuitBreakerRepo
+    );
 
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [AgentsController],
       providers: [
         { provide: RegisterAgentUseCase, useValue: registerUseCase },
         { provide: ProcessHeartbeatUseCase, useValue: heartbeatUseCase },
-        { provide: IAgentRepo, useValue: fakeAgentRepo },
-        { provide: ICircuitBreakerRepo, useValue: fakeCbRepo },
-        { provide: IAuditLogRepo, useValue: fakeAudit }
+        { provide: ListAgentsUseCase, useValue: listAgents },
+        { provide: GetAgentUseCase, useValue: getAgent },
+        { provide: GetAgentStatusUseCase, useValue: getAgentStatus },
+        { provide: ListAgentCircuitBreakersUseCase, useValue: listAgentCircuitBreakers }
       ]
     }).compile();
 

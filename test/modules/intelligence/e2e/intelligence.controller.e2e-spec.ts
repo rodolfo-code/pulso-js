@@ -5,13 +5,14 @@ import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ComputeHealthScoreUseCase } from "@/modules/intelligence/application/use-cases/compute-health-score.use-case";
+import { ListAgentsWithHealthScoresUseCase } from "@/modules/intelligence/application/use-cases/list-agents-with-health-scores.use-case";
 import { IntelligenceController } from "@/modules/intelligence/presentation/controllers/intelligence.controller";
 import type { EnvConfig } from "@/shared/config/env.config";
 import { Agent } from "@/shared/domain/entities/agent.entity";
 import { AgentStatus } from "@/shared/domain/value-objects/agent-status.vo";
 import { DomainExceptionFilter } from "@/shared/http/filters/domain-exception.filter";
 import type { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
-import { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
+import type { IAgentRepo } from "@/shared/repositories/interfaces/agent-repo.interface";
 import type { ICircuitBreakerRepo } from "@/shared/repositories/interfaces/circuit-breaker-repo.interface";
 import type { IHealthScoreRepo } from "@/shared/repositories/interfaces/health-score-repo.interface";
 
@@ -69,11 +70,16 @@ describe("IntelligenceController (e2e)", () => {
       fakeConfig
     );
 
+    const listAgentsWithHealthScores = new ListAgentsWithHealthScoresUseCase(
+      fakeAgentRepo as unknown as IAgentRepo,
+      useCase
+    );
+
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [IntelligenceController],
       providers: [
         { provide: ComputeHealthScoreUseCase, useValue: useCase },
-        { provide: IAgentRepo, useValue: fakeAgentRepo }
+        { provide: ListAgentsWithHealthScoresUseCase, useValue: listAgentsWithHealthScores }
       ]
     }).compile();
 
