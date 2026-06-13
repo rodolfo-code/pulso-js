@@ -50,8 +50,11 @@
 10. **Value Object tem propriedades `readonly`.**
     Porquê: VO é definido por valor; se muda no meio da vida, deixa de ser VO.
 
-11. **Use case retorna entidade/VO do domínio, nunca Prisma model nem DTO.**
-    Porquê: se vaza Prisma, infra escapa pra cima; se vaza DTO, application conhece a borda HTTP.
+11. **Use case retorna entidade, VO ou DTO de aplicação — nunca Prisma model nem DTO HTTP.**
+    Porquê:
+    - Prisma model vazado faz infra escapar pra cima.
+    - DTO HTTP vazado (request body / response body de controller) faz application conhecer a borda HTTP.
+    - **DTO de aplicação** é categoria distinta: shape de saída próprio do use case, sem dependência de framework HTTP nem de ORM. Usado quando o retorno não é entidade nem VO (sem invariante/comportamento de domínio) — ex.: projeção de leitura, agregação para consumo do controller. Vive em `<modulo>/application/dtos/` com sufixo `.dto.ts`. **NÃO** importa `@nestjs/*`, `class-validator`, nem `@prisma/client`.
 
 12. **Use case lança `DomainError`, nunca `HttpException` ou status HTTP.**
     Porquê: use case não conhece HTTP. O filtro em `presentation/` converte `DomainError` em status.

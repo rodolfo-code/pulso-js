@@ -35,7 +35,7 @@
 | `.repository.ts`      | Implementação de `IXRepo` em `infrastructure/`         |
 | `.mapper.ts`          | Conversor entre Prisma model e entidade/VO de domínio  |
 | `.controller.ts`      | Controller HTTP em `presentation/`                     |
-| `.dto.ts`             | DTO de entrada ou saída HTTP                           |
+| `.dto.ts`             | DTO. Categoria dada pela pasta: `application/dtos/` = DTO de saída de use case (puro TS, zero framework). `presentation/dtos/` = DTO HTTP (request body / response body, com `class-validator`). |
 | `.module.ts`          | Módulo NestJS                                          |
 | `.guard.ts`           | Guard de autenticação/autorização                      |
 | `.filter.ts`          | Exception filter                                       |
