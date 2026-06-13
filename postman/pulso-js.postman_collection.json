@@ -22,7 +22,8 @@
     { "key": "sessionId", "value": "sess-abc-123", "type": "string" },
     { "key": "promptName", "value": "acme/billing/v1/greeting", "type": "string" },
     { "key": "datasetName", "value": "eval-set", "type": "string" },
-    { "key": "sloId", "value": "00000000-0000-4000-8000-000000000101", "type": "string" }
+    { "key": "sloId", "value": "00000000-0000-4000-8000-000000000101", "type": "string" },
+    { "key": "clientId", "value": "tenant-teste-2", "type": "string" }
   ],
   "item": [
     {
@@ -234,6 +235,67 @@
               "path": ["slos", "{{sloId}}", "evaluations"]
             },
             "description": "Histórico de avaliações de um SLO, ordenado pelo mais recente. Retorna 404 se SLO não existir."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Observations",
+      "item": [
+        {
+          "name": "GET /observations/clients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/observations/clients",
+              "host": ["{{baseUrl}}"],
+              "path": ["observations", "clients"]
+            },
+            "description": "Lista clientes (usuários finais) combinando dados do Postgres (agents) com traces do Langfuse. Agrupa por userId. Quando o agent do trace bate com um agent registrado, enriquece com slug/name/status/version."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /observations/clients/:clientId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/observations/clients/{{clientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["observations", "clients", "{{clientId}}"]
+            },
+            "description": "Detalhe de um cliente específico. Filtra traces por userId={{clientId}}. Retorna 404 se nenhum trace casar."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /observations/conversations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/observations/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["observations", "conversations"]
+            },
+            "description": "Lista todas as sessões/conversas do Langfuse. Espelha o legado: bypassa use case e chama langfuse.getSessions() direto (tech debt herdada)."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /observations/conversations/:sessionId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/observations/conversations/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["observations", "conversations", "{{sessionId}}"]
+            },
+            "description": "Detalhe de uma conversa específica. Retorna { session, traces[] } onde cada trace é enriquecido com hierarchy (tenantId/system/agent/userId/sessionId extraídos do metadata). Retorna 404 se a session não existir no Langfuse."
           },
           "response": []
         }

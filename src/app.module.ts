@@ -5,6 +5,7 @@ import { AgentsModule } from "./modules/agents/agents.module";
 import { HealthModule } from "./modules/health/health.module";
 import { IntelligenceModule } from "./modules/intelligence/intelligence.module";
 import { LangfuseProxyModule } from "./modules/langfuse-proxy/langfuse-proxy.module";
+import { ObservationsModule } from "./modules/observations/observations.module";
 import { SLOsModule } from "./modules/slos/slos.module";
 import { AuthModule } from "./shared/auth/auth.module";
 import { ConfigModule } from "./shared/config/config.module";
@@ -25,7 +26,8 @@ import { RepositoriesModule } from "./shared/repositories/repositories.module";
     LangfuseProxyModule,
     AgentsModule,
     IntelligenceModule,
-    SLOsModule
+    SLOsModule,
+    ObservationsModule
   ],
   providers: [
     {
