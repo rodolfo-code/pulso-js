@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { PromptDto } from "@/modules/langfuse-proxy/application/dtos/prompt.dto";
 import { CreatePromptUseCase } from "@/modules/langfuse-proxy/application/use-cases/create-prompt.use-case";
 import type { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import type { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
@@ -119,7 +120,7 @@ describe("CreatePromptUseCase", () => {
     );
   });
 
-  it("returns the langfuse response", async () => {
+  it("returns a PromptDto mapped from the langfuse response", async () => {
     const langfuseResponse = {
       id: "550e8400-e29b-41d4-a716-446655440000",
       name: "acme/billing/v1/greeting",
@@ -129,7 +130,12 @@ describe("CreatePromptUseCase", () => {
 
     const result = await useCase.execute(DEFAULT_REQUEST);
 
-    expect(result).toBe(langfuseResponse);
+    expect(result).toBeInstanceOf(PromptDto);
+    expect(result).toMatchObject({
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      name: "acme/billing/v1/greeting",
+      version: 3
+    });
   });
 
   it("does NOT propagate audit log failure", async () => {
@@ -138,7 +144,7 @@ describe("CreatePromptUseCase", () => {
     await expect(useCase.execute(DEFAULT_REQUEST)).resolves.toBeDefined();
   });
 
-  it("returns langfuse response even when audit log fails", async () => {
+  it("returns PromptDto even when audit log fails", async () => {
     const langfuseResponse = { id: "550e8400-e29b-41d4-a716-446655440000" };
     const { useCase } = makeUseCase({
       createPromptResult: langfuseResponse,
@@ -147,6 +153,7 @@ describe("CreatePromptUseCase", () => {
 
     const result = await useCase.execute(DEFAULT_REQUEST);
 
-    expect(result).toBe(langfuseResponse);
+    expect(result).toBeInstanceOf(PromptDto);
+    expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440000");
   });
 });

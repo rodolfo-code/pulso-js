@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
+import { ScoreConfigDto } from "@/modules/langfuse-proxy/application/dtos/score-config.dto";
 import { buildScoreConfigName } from "@/shared/domain/services/taxonomy";
 import {
   ILangfuseClient,
@@ -16,7 +17,7 @@ export interface CreateScoreConfigRequest {
 export class CreateScoreConfigUseCase {
   constructor(private readonly langfuse: ILangfuseClient) {}
 
-  async execute(request: CreateScoreConfigRequest): Promise<LangfuseEntity> {
+  async execute(request: CreateScoreConfigRequest): Promise<ScoreConfigDto> {
     const canonicalName = buildScoreConfigName(
       request.tenantSlug ?? "",
       request.name ?? ""
@@ -30,6 +31,7 @@ export class CreateScoreConfigUseCase {
       name: canonicalName
     };
 
-    return this.langfuse.createScoreConfig(payload);
+    const raw = await this.langfuse.createScoreConfig(payload);
+    return ScoreConfigDto.fromLangfuse(raw);
   }
 }

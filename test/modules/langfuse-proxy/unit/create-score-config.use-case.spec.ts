@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ScoreConfigDto } from "@/modules/langfuse-proxy/application/dtos/score-config.dto";
 import { CreateScoreConfigUseCase } from "@/modules/langfuse-proxy/application/use-cases/create-score-config.use-case";
 import type { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 
@@ -66,7 +67,7 @@ describe("CreateScoreConfigUseCase", () => {
     );
   });
 
-  it("returns the langfuse response", async () => {
+  it("returns a ScoreConfigDto mapped from the langfuse response", async () => {
     const langfuseResponse = {
       id: "550e8400-e29b-41d4-a716-446655440000",
       name: "acme/latency",
@@ -76,6 +77,11 @@ describe("CreateScoreConfigUseCase", () => {
 
     const result = await useCase.execute(DEFAULT_REQUEST);
 
-    expect(result).toBe(langfuseResponse);
+    expect(result).toBeInstanceOf(ScoreConfigDto);
+    expect(result).toMatchObject({
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      name: "acme/latency",
+      dataType: "NUMERIC"
+    });
   });
 });

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 
+import { PromptDto } from "@/modules/langfuse-proxy/application/dtos/prompt.dto";
 import { buildPromptName } from "@/shared/domain/services/taxonomy";
 import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
 import {
@@ -25,7 +26,7 @@ export class CreatePromptUseCase {
     private readonly auditRepo: IAuditLogRepo
   ) {}
 
-  async execute(request: CreatePromptRequest): Promise<LangfuseEntity> {
+  async execute(request: CreatePromptRequest): Promise<PromptDto> {
     const canonicalName = buildPromptName(
       request.tenantSlug ?? "",
       request.systemSlug ?? "",
@@ -43,9 +44,9 @@ export class CreatePromptUseCase {
       name: canonicalName
     };
 
-    const result = await this.langfuse.createPrompt(payload);
+    const raw = await this.langfuse.createPrompt(payload);
 
-    const promptId = result["id"] as string;
+    const promptId = String(raw["id"] ?? "");
 
     try {
       const entry = AuditLogEntry.create({
@@ -63,6 +64,6 @@ export class CreatePromptUseCase {
       );
     }
 
-    return result;
+    return PromptDto.fromLangfuse(raw);
   }
 }

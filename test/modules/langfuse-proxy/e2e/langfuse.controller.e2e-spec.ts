@@ -4,8 +4,24 @@ import { Test, type TestingModule } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { CreateDatasetItemUseCase } from "@/modules/langfuse-proxy/application/use-cases/create-dataset-item.use-case";
+import { CreateDatasetUseCase } from "@/modules/langfuse-proxy/application/use-cases/create-dataset.use-case";
 import { CreatePromptUseCase } from "@/modules/langfuse-proxy/application/use-cases/create-prompt.use-case";
 import { CreateScoreConfigUseCase } from "@/modules/langfuse-proxy/application/use-cases/create-score-config.use-case";
+import { DeletePromptUseCase } from "@/modules/langfuse-proxy/application/use-cases/delete-prompt.use-case";
+import { GetLangfuseHealthUseCase } from "@/modules/langfuse-proxy/application/use-cases/get-langfuse-health.use-case";
+import { GetMetricsDailyUseCase } from "@/modules/langfuse-proxy/application/use-cases/get-metrics-daily.use-case";
+import { GetPromptUseCase } from "@/modules/langfuse-proxy/application/use-cases/get-prompt.use-case";
+import { GetSessionUseCase } from "@/modules/langfuse-proxy/application/use-cases/get-session.use-case";
+import { GetTraceUseCase } from "@/modules/langfuse-proxy/application/use-cases/get-trace.use-case";
+import { ListDatasetItemsUseCase } from "@/modules/langfuse-proxy/application/use-cases/list-dataset-items.use-case";
+import { ListDatasetsUseCase } from "@/modules/langfuse-proxy/application/use-cases/list-datasets.use-case";
+import { ListPromptsUseCase } from "@/modules/langfuse-proxy/application/use-cases/list-prompts.use-case";
+import { ListScoreConfigsUseCase } from "@/modules/langfuse-proxy/application/use-cases/list-score-configs.use-case";
+import { ListScoresUseCase } from "@/modules/langfuse-proxy/application/use-cases/list-scores.use-case";
+import { ListSessionsUseCase } from "@/modules/langfuse-proxy/application/use-cases/list-sessions.use-case";
+import { ListTraceObservationsUseCase } from "@/modules/langfuse-proxy/application/use-cases/list-trace-observations.use-case";
+import { ListTracesUseCase } from "@/modules/langfuse-proxy/application/use-cases/list-traces.use-case";
 import { WriteScoreUseCase } from "@/modules/langfuse-proxy/application/use-cases/write-score.use-case";
 import { LangfuseController } from "@/modules/langfuse-proxy/presentation/controllers/langfuse.controller";
 import { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
@@ -25,9 +41,25 @@ describe("LangfuseController (e2e)", () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [LangfuseController],
       providers: [
+        GetLangfuseHealthUseCase,
+        ListTracesUseCase,
+        GetTraceUseCase,
+        ListTraceObservationsUseCase,
+        ListSessionsUseCase,
+        GetSessionUseCase,
+        ListScoresUseCase,
         WriteScoreUseCase,
+        GetMetricsDailyUseCase,
+        ListPromptsUseCase,
         CreatePromptUseCase,
+        GetPromptUseCase,
+        DeletePromptUseCase,
+        ListScoreConfigsUseCase,
         CreateScoreConfigUseCase,
+        ListDatasetsUseCase,
+        CreateDatasetUseCase,
+        ListDatasetItemsUseCase,
+        CreateDatasetItemUseCase,
         { provide: ILangfuseClient, useValue: fakeLangfuse },
         { provide: IAuditLogRepo, useValue: { append: auditAppend } }
       ]
@@ -52,13 +84,13 @@ describe("LangfuseController (e2e)", () => {
   });
 
   // ── Health ──────────────────────────────────────────────────────────
-  it("GET /langfuse/health → returns langfuse body", async () => {
+  it("GET /langfuse/health → returns mapped health DTO", async () => {
     fakeLangfuse.getHealth.mockResolvedValueOnce({ status: "OK", version: "3.0" });
 
     const res = await request(app!.getHttpServer()).get("/langfuse/health");
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ status: "OK", version: "3.0" });
+    expect(res.body).toMatchObject({ status: "OK", version: "3.0" });
     expect(fakeLangfuse.getHealth).toHaveBeenCalledTimes(1);
   });
 
@@ -71,7 +103,10 @@ describe("LangfuseController (e2e)", () => {
       .query({ userId: "u1", sessionId: "s1" });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([{ id: "t1" }, { id: "t2" }]);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body).toHaveLength(2);
+    expect(res.body[0]).toMatchObject({ id: "t1" });
+    expect(res.body[1]).toMatchObject({ id: "t2" });
     expect(fakeLangfuse.getTraces).toHaveBeenCalledTimes(1);
     expect(fakeLangfuse.getTraces).toHaveBeenCalledWith(
       expect.objectContaining({ userId: "u1", sessionId: "s1" })
@@ -84,7 +119,7 @@ describe("LangfuseController (e2e)", () => {
     const res = await request(app!.getHttpServer()).get("/langfuse/traces/trace-abc");
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ id: "trace-abc" });
+    expect(res.body).toMatchObject({ id: "trace-abc" });
     expect(fakeLangfuse.getTrace).toHaveBeenCalledWith("trace-abc");
   });
 
@@ -96,7 +131,8 @@ describe("LangfuseController (e2e)", () => {
     );
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([{ id: "o1" }]);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: "o1" });
     expect(fakeLangfuse.getTraceObservations).toHaveBeenCalledWith("trace-abc");
     expect(fakeLangfuse.getTrace).not.toHaveBeenCalled();
   });
@@ -110,7 +146,8 @@ describe("LangfuseController (e2e)", () => {
       .query({ userId: "u1" });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([{ id: "s1" }]);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: "s1" });
     expect(fakeLangfuse.getSessions).toHaveBeenCalledWith(
       expect.objectContaining({ userId: "u1" })
     );
@@ -122,7 +159,7 @@ describe("LangfuseController (e2e)", () => {
     const res = await request(app!.getHttpServer()).get("/langfuse/sessions/sess-abc");
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ id: "sess-abc" });
+    expect(res.body).toMatchObject({ id: "sess-abc" });
     expect(fakeLangfuse.getSession).toHaveBeenCalledWith("sess-abc");
   });
 
@@ -153,7 +190,7 @@ describe("LangfuseController (e2e)", () => {
     });
 
     expect(res.status).toBe(201);
-    expect(res.body).toEqual({ id: "550e8400-e29b-41d4-a716-446655440000" });
+    expect(res.body).toMatchObject({ id: "550e8400-e29b-41d4-a716-446655440000" });
     expect(fakeLangfuse.createScore).toHaveBeenCalledWith({
       traceId: "trace-1",
       name: "acme/latency",
@@ -193,14 +230,14 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Metrics ─────────────────────────────────────────────────────────
   it("GET /langfuse/metrics/daily → forwards filters and returns body", async () => {
-    fakeLangfuse.getMetricsDaily.mockResolvedValueOnce({ traces: 42 });
+    fakeLangfuse.getMetricsDaily.mockResolvedValueOnce({ data: [{ traces: 42 }], meta: {} });
 
     const res = await request(app!.getHttpServer())
       .get("/langfuse/metrics/daily")
       .query({ traceName: "checkout", userId: "u1" });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ traces: 42 });
+    expect(res.body).toMatchObject({ data: [{ traces: 42 }] });
     expect(fakeLangfuse.getMetricsDaily).toHaveBeenCalledWith(
       expect.objectContaining({ traceName: "checkout", userId: "u1" })
     );
@@ -213,7 +250,8 @@ describe("LangfuseController (e2e)", () => {
     const res = await request(app!.getHttpServer()).get("/langfuse/prompts");
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([{ id: "p1" }]);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: "p1" });
   });
 
   it("POST /langfuse/prompts → builds canonical name and strips observatory fields", async () => {
@@ -283,7 +321,8 @@ describe("LangfuseController (e2e)", () => {
     const res = await request(app!.getHttpServer()).get("/langfuse/score-configs");
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([{ id: "sc1" }]);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: "sc1" });
   });
 
   it("POST /langfuse/score-configs → builds canonical name and strips tenantSlug", async () => {
@@ -317,7 +356,8 @@ describe("LangfuseController (e2e)", () => {
     const res = await request(app!.getHttpServer()).get("/langfuse/datasets");
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([{ id: "d1" }]);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: "d1" });
   });
 
   it("POST /langfuse/datasets → forwards body verbatim", async () => {
@@ -341,7 +381,8 @@ describe("LangfuseController (e2e)", () => {
     );
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([{ id: "i1" }]);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: "i1" });
     expect(fakeLangfuse.getDatasetItems).toHaveBeenCalledWith("eval-set");
   });
 

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 
+import { ScoreDto } from "@/modules/langfuse-proxy/application/dtos/score.dto";
 import { AuditLogEntry } from "@/shared/domain/value-objects/audit-log-entry.vo";
 import {
   ILangfuseClient,
@@ -23,7 +24,7 @@ export class WriteScoreUseCase {
     private readonly auditRepo: IAuditLogRepo
   ) {}
 
-  async execute(request: WriteScoreRequest): Promise<LangfuseEntity> {
+  async execute(request: WriteScoreRequest): Promise<ScoreDto> {
     const data: LangfuseEntity = {
       traceId: request.traceId,
       name: request.name,
@@ -33,9 +34,9 @@ export class WriteScoreUseCase {
       data["comment"] = request.comment;
     }
 
-    const result = await this.langfuse.createScore(data);
+    const raw = await this.langfuse.createScore(data);
 
-    const scoreId = result["id"] as string;
+    const scoreId = String(raw["id"] ?? "");
 
     try {
       const entry = AuditLogEntry.create({
@@ -57,6 +58,6 @@ export class WriteScoreUseCase {
       );
     }
 
-    return result;
+    return ScoreDto.fromLangfuse(raw);
   }
 }

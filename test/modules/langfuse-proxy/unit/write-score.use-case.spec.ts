@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ScoreDto } from "@/modules/langfuse-proxy/application/dtos/score.dto";
 import { WriteScoreUseCase } from "@/modules/langfuse-proxy/application/use-cases/write-score.use-case";
 import type { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import type { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
@@ -114,7 +115,7 @@ describe("WriteScoreUseCase", () => {
     );
   });
 
-  it("returns the langfuse response", async () => {
+  it("returns a ScoreDto mapped from the langfuse response", async () => {
     const langfuseResponse = {
       id: "550e8400-e29b-41d4-a716-446655440000",
       traceId: "trace-1",
@@ -130,7 +131,13 @@ describe("WriteScoreUseCase", () => {
       value: 0.85
     });
 
-    expect(result).toBe(langfuseResponse);
+    expect(result).toBeInstanceOf(ScoreDto);
+    expect(result).toMatchObject({
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      traceId: "trace-1",
+      name: "acme/latency",
+      value: 0.85
+    });
   });
 
   it("does NOT propagate audit log failure", async () => {
@@ -145,7 +152,7 @@ describe("WriteScoreUseCase", () => {
     ).resolves.toBeDefined();
   });
 
-  it("returns langfuse response even when audit log fails", async () => {
+  it("returns ScoreDto even when audit log fails", async () => {
     const langfuseResponse = { id: "550e8400-e29b-41d4-a716-446655440000" };
     const { useCase } = makeUseCase({
       createScoreResult: langfuseResponse,
@@ -158,6 +165,7 @@ describe("WriteScoreUseCase", () => {
       value: 0.85
     });
 
-    expect(result).toBe(langfuseResponse);
+    expect(result).toBeInstanceOf(ScoreDto);
+    expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440000");
   });
 });
