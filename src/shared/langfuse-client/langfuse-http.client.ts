@@ -1,5 +1,34 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import type {
+  ApiCreateDatasetItemRequest,
+  ApiCreateDatasetRequest,
+  ApiCreatePromptRequest,
+  ApiCreateScoreConfigRequest,
+  ApiCreateScoreRequest,
+  ApiCreateScoreResponse,
+  ApiDataset,
+  ApiDatasetItem,
+  ApiGetScoresResponse,
+  ApiGetScoresResponseData,
+  ApiHealthResponse,
+  ApiMetricsResponse,
+  ApiObservation,
+  ApiObservations,
+  ApiPaginatedDatasetItems,
+  ApiPaginatedDatasets,
+  ApiPaginatedSessions,
+  ApiPrompt,
+  ApiPromptMeta,
+  ApiPromptMetaListResponse,
+  ApiScoreConfig,
+  ApiScoreConfigs,
+  ApiSession,
+  ApiSessionWithTraces,
+  ApiTraceWithDetails,
+  ApiTraceWithFullDetails,
+  ApiTraces
+} from "langfuse";
 
 import type { EnvConfig } from "@/shared/config/env.config";
 
@@ -8,9 +37,7 @@ import { LangfuseUnavailableError } from "./errors/langfuse-unavailable.error";
 import { LangfuseUpstreamError } from "./errors/langfuse-upstream.error";
 import {
   ILangfuseClient,
-  type LangfuseEntity,
-  type LangfuseFilters,
-  type LangfuseList
+  type LangfuseFilters
 } from "./interfaces/langfuse-client.interface";
 
 const TIMEOUT_MS = 30_000;
@@ -36,78 +63,75 @@ export class LangfuseHttpClient extends ILangfuseClient {
   }
 
   // ── Health ─────────────────────────────────────────────────────────
-  async getHealth(): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("GET", "/api/public/health", { withAuth: false });
+  async getHealth(): Promise<ApiHealthResponse> {
+    return this.request<ApiHealthResponse>("GET", "/api/public/health", { withAuth: false });
   }
 
   // ── Traces ─────────────────────────────────────────────────────────
-  async getTraces(filters?: LangfuseFilters): Promise<LangfuseList> {
-    const response = await this.request<{ data?: LangfuseList }>(
-      "GET",
-      "/api/public/traces",
-      { query: filters }
-    );
+  async getTraces(filters?: LangfuseFilters): Promise<ApiTraceWithDetails[]> {
+    const response = await this.request<ApiTraces>("GET", "/api/public/traces", {
+      query: filters
+    });
     return response.data ?? [];
   }
 
-  async getTrace(traceId: string): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("GET", `/api/public/traces/${traceId}`);
+  async getTrace(traceId: string): Promise<ApiTraceWithFullDetails> {
+    return this.request<ApiTraceWithFullDetails>("GET", `/api/public/traces/${traceId}`);
   }
 
-  async getTraceObservations(traceId: string): Promise<LangfuseList> {
-    const response = await this.request<{ data?: LangfuseList }>(
-      "GET",
-      "/api/public/observations",
-      { query: { traceId } }
-    );
+  async getTraceObservations(traceId: string): Promise<ApiObservation[]> {
+    const response = await this.request<ApiObservations>("GET", "/api/public/observations", {
+      query: { traceId }
+    });
     return response.data ?? [];
   }
 
   // ── Sessions ───────────────────────────────────────────────────────
-  async getSessions(filters?: LangfuseFilters): Promise<LangfuseList> {
-    const response = await this.request<{ data?: LangfuseList }>(
-      "GET",
-      "/api/public/sessions",
-      { query: filters }
-    );
+  async getSessions(filters?: LangfuseFilters): Promise<ApiSession[]> {
+    const response = await this.request<ApiPaginatedSessions>("GET", "/api/public/sessions", {
+      query: filters
+    });
     return response.data ?? [];
   }
 
-  async getSession(sessionId: string): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("GET", `/api/public/sessions/${sessionId}`);
+  async getSession(sessionId: string): Promise<ApiSessionWithTraces> {
+    return this.request<ApiSessionWithTraces>("GET", `/api/public/sessions/${sessionId}`);
   }
 
   // ── Scores ─────────────────────────────────────────────────────────
-  async getScores(filters?: LangfuseFilters): Promise<LangfuseList> {
-    const response = await this.request<{ data?: LangfuseList }>(
+  async getScores(filters?: LangfuseFilters): Promise<ApiGetScoresResponseData[]> {
+    const response = await this.request<ApiGetScoresResponse>("GET", "/api/public/scores", {
+      query: filters
+    });
+    return response.data ?? [];
+  }
+
+  async createScore(data: ApiCreateScoreRequest): Promise<ApiCreateScoreResponse> {
+    return this.request<ApiCreateScoreResponse>("POST", "/api/public/scores", { body: data });
+  }
+
+  // ── Metrics ────────────────────────────────────────────────────────
+  async getMetricsDaily(filters?: LangfuseFilters): Promise<ApiMetricsResponse> {
+    return this.request<ApiMetricsResponse>("GET", "/api/public/metrics/daily", {
+      query: filters
+    });
+  }
+
+  // ── Prompts ────────────────────────────────────────────────────────
+  async getPrompts(): Promise<ApiPromptMeta[]> {
+    const response = await this.request<ApiPromptMetaListResponse>(
       "GET",
-      "/api/public/scores",
-      { query: filters }
+      "/api/public/prompts"
     );
     return response.data ?? [];
   }
 
-  async createScore(data: LangfuseEntity): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("POST", "/api/public/scores", { body: data });
+  async getPrompt(name: string): Promise<ApiPrompt> {
+    return this.request<ApiPrompt>("GET", `/api/public/prompts/${name}`);
   }
 
-  // ── Metrics ────────────────────────────────────────────────────────
-  async getMetricsDaily(filters?: LangfuseFilters): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("GET", "/api/public/metrics/daily", { query: filters });
-  }
-
-  // ── Prompts ────────────────────────────────────────────────────────
-  async getPrompts(): Promise<LangfuseList> {
-    const response = await this.request<{ data?: LangfuseList }>("GET", "/api/public/prompts");
-    return response.data ?? [];
-  }
-
-  async getPrompt(name: string): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("GET", `/api/public/prompts/${name}`);
-  }
-
-  async createPrompt(data: LangfuseEntity): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("POST", "/api/public/prompts", { body: data });
+  async createPrompt(data: ApiCreatePromptRequest): Promise<ApiPrompt> {
+    return this.request<ApiPrompt>("POST", "/api/public/prompts", { body: data });
   }
 
   async deletePrompt(name: string): Promise<void> {
@@ -115,39 +139,40 @@ export class LangfuseHttpClient extends ILangfuseClient {
   }
 
   // ── Score Configs ──────────────────────────────────────────────────
-  async getScoreConfigs(): Promise<LangfuseList> {
-    const response = await this.request<{ data?: LangfuseList }>("GET", "/api/public/score-configs");
+  async getScoreConfigs(): Promise<ApiScoreConfig[]> {
+    const response = await this.request<ApiScoreConfigs>("GET", "/api/public/score-configs");
     return response.data ?? [];
   }
 
-  async createScoreConfig(data: LangfuseEntity): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("POST", "/api/public/score-configs", { body: data });
+  async createScoreConfig(data: ApiCreateScoreConfigRequest): Promise<ApiScoreConfig> {
+    return this.request<ApiScoreConfig>("POST", "/api/public/score-configs", { body: data });
   }
 
   // ── Datasets ───────────────────────────────────────────────────────
-  async getDatasets(): Promise<LangfuseList> {
-    const response = await this.request<{ data?: LangfuseList }>("GET", "/api/public/datasets");
+  async getDatasets(): Promise<ApiDataset[]> {
+    const response = await this.request<ApiPaginatedDatasets>("GET", "/api/public/datasets");
     return response.data ?? [];
   }
 
-  async createDataset(data: LangfuseEntity): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>("POST", "/api/public/datasets", { body: data });
+  async createDataset(data: ApiCreateDatasetRequest): Promise<ApiDataset> {
+    return this.request<ApiDataset>("POST", "/api/public/datasets", { body: data });
   }
 
-  async getDatasetItems(name: string): Promise<LangfuseList> {
-    const response = await this.request<{ data?: LangfuseList }>(
+  async getDatasetItems(name: string): Promise<ApiDatasetItem[]> {
+    const response = await this.request<ApiPaginatedDatasetItems>(
       "GET",
       `/api/public/datasets/${name}/items`
     );
     return response.data ?? [];
   }
 
-  async createDatasetItem(name: string, data: LangfuseEntity): Promise<LangfuseEntity> {
-    return this.request<LangfuseEntity>(
-      "POST",
-      `/api/public/datasets/${name}/items`,
-      { body: data }
-    );
+  async createDatasetItem(
+    name: string,
+    data: ApiCreateDatasetItemRequest
+  ): Promise<ApiDatasetItem> {
+    return this.request<ApiDatasetItem>("POST", `/api/public/datasets/${name}/items`, {
+      body: data
+    });
   }
 
   // ── HTTP helper privado ────────────────────────────────────────────

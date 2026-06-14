@@ -1,12 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
+import type { ApiCreatePromptRequest } from "langfuse";
 
 import { PromptDto } from "@/modules/langfuse-proxy/application/dtos/prompt.dto";
 import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
 import { buildPromptName } from "@/shared/domain/services/taxonomy";
-import {
-  ILangfuseClient,
-  type LangfuseEntity
-} from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
+import { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
 
 export interface CreatePromptRequest {
@@ -39,14 +37,14 @@ export class CreatePromptUseCase {
     void systemSlug;
     void agentSlug;
 
-    const payload: LangfuseEntity = {
+    const payload = {
       ...rest,
       name: canonicalName
-    };
+    } as unknown as ApiCreatePromptRequest;
 
     const raw = await this.langfuse.createPrompt(payload);
 
-    const promptId = String(raw["id"] ?? "");
+    const promptId = `${raw.name}:v${raw.version}`;
 
     try {
       const entry = AuditLogEntry.create({

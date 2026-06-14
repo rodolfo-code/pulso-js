@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
+import type { ApiSession, ApiSessionWithTraces, ApiTraceWithDetails } from "langfuse";
 
 import type {
   ConversationDetailDto,
@@ -7,10 +8,7 @@ import type {
 import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
 import { extractHierarchy } from "@/shared/domain/services/extract-hierarchy.service";
 import { LangfuseUpstreamError } from "@/shared/langfuse-client/errors/langfuse-upstream.error";
-import {
-  ILangfuseClient,
-  type LangfuseEntity
-} from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
+import { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 
 @Injectable()
 export class GetConversationDetailUseCase {
@@ -21,20 +19,17 @@ export class GetConversationDetailUseCase {
   ) {}
 
   async execute(sessionId: string): Promise<ConversationDetailDto> {
-    let session: LangfuseEntity;
+    let session: ApiSessionWithTraces;
     try {
       session = await this.langfuse.getSession(sessionId);
     } catch (error) {
-      // Só vira 404 quando o Langfuse explicitamente respondeu 404.
-      // Outros erros (502 upstream, 504 timeout, auth, rede) propagam como vieram —
-      // o DomainExceptionFilter global mapeia cada um pra o status apropriado.
       if (error instanceof LangfuseUpstreamError && error.httpStatus === 404) {
         throw new DomainNotFoundError(`Session not found: ${sessionId}`, { cause: error });
       }
       throw error;
     }
 
-    let traces: Record<string, unknown>[] = [];
+    let traces: ApiTraceWithDetails[] = [];
     try {
       traces = await this.langfuse.getTraces({ sessionId });
     } catch (error) {
@@ -61,9 +56,9 @@ export class GetConversationDetailUseCase {
     // Remove os traces que o Langfuse incluiu dentro do response da session —
     // ficam duplicados com `traces` (enriquecido). Decisão consciente de divergir
     // do legado pra eliminar payload redundante.
-    const sessionWithoutTraces: LangfuseEntity = { ...session };
-    delete sessionWithoutTraces["traces"];
+    const { traces: _, ...sessionWithoutTraces } = session;
+    void _;
 
-    return { session: sessionWithoutTraces, traces: enrichedTraces };
+    return { session: sessionWithoutTraces as ApiSession, traces: enrichedTraces };
   }
 }

@@ -1,13 +1,12 @@
+import type { ApiHealthResponse } from "langfuse";
+
 export class LangfuseHealthDto {
   constructor(
     public readonly status: string,
-    public readonly version: string | null
+    public readonly version: string
   ) {}
 
-  static fromLangfuse(d: Record<string, unknown>): LangfuseHealthDto {
-    return new LangfuseHealthDto(
-      String(d["status"] ?? "unknown"),
-      d["version"] == null ? null : String(d["version"])
-    );
+  static fromLangfuse(d: ApiHealthResponse): LangfuseHealthDto {
+    return new LangfuseHealthDto(d.status, d.version);
   }
 }

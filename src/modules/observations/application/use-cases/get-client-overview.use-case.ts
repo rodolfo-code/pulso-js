@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
+import type { ApiTraceWithDetails } from "langfuse";
 
 import type { ClientOverviewDto } from "@/modules/observations/application/dtos/client-overview.dto";
 import { extractHierarchy } from "@/shared/domain/services/extract-hierarchy.service";
@@ -21,7 +22,7 @@ export class GetClientOverviewUseCase {
     const agents = await this.agentRepo.listAgents();
     const agentMap = new Map(agents.map((a) => [a.slug, a]));
 
-    let traces: Record<string, unknown>[] = [];
+    let traces: ApiTraceWithDetails[] = [];
     try {
       traces = await this.langfuse.getTraces(filters);
     } catch (error) {
@@ -53,8 +54,7 @@ export class GetClientOverviewUseCase {
       entry.tenantId = h.tenantId;
       entry.system = h.system;
       entry.traceCount += 1;
-      const rawId = trace["id"];
-      entry.traceIds.push(typeof rawId === "string" ? rawId : null);
+      entry.traceIds.push(trace.id);
 
       // Enriquece com identidade do agent quando possível (1ª vez encontrado)
       if (h.agent && entry.agent === null) {

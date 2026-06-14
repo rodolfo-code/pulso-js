@@ -1,8 +1,4 @@
-import {
-  ILangfuseClient,
-  type LangfuseEntity,
-  type LangfuseList
-} from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
+import { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 
 export class FakeLangfuseClient extends ILangfuseClient {
   private shouldFail = false;
@@ -11,67 +7,67 @@ export class FakeLangfuseClient extends ILangfuseClient {
     this.shouldFail = value;
   }
 
-  async getHealth(): Promise<LangfuseEntity> {
+  async getHealth(): ReturnType<ILangfuseClient["getHealth"]> {
     if (this.shouldFail) {
       throw new Error("fetch failed (fake)");
     }
-    return { status: "ok" };
+    return { status: "ok", version: "1.0.0" };
   }
 
-  // Métodos abaixo não são exercitados pelos testes atuais (only getHealth).
-  // Serão sobrescritos por fakes específicos quando os testes do langfuse-proxy chegarem.
-  getTraces(): Promise<LangfuseList> {
+  // Os métodos abaixo não são exercitados pelos testes que usam este fake.
+  // Serão sobrescritos por fakes específicos quando necessário.
+  getTraces(): ReturnType<ILangfuseClient["getTraces"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getTraces not implemented"));
   }
-  getTrace(): Promise<LangfuseEntity> {
+  getTrace(): ReturnType<ILangfuseClient["getTrace"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getTrace not implemented"));
   }
-  getTraceObservations(): Promise<LangfuseList> {
+  getTraceObservations(): ReturnType<ILangfuseClient["getTraceObservations"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getTraceObservations not implemented"));
   }
-  getSessions(): Promise<LangfuseList> {
+  getSessions(): ReturnType<ILangfuseClient["getSessions"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getSessions not implemented"));
   }
-  getSession(): Promise<LangfuseEntity> {
+  getSession(): ReturnType<ILangfuseClient["getSession"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getSession not implemented"));
   }
-  getScores(): Promise<LangfuseList> {
+  getScores(): ReturnType<ILangfuseClient["getScores"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getScores not implemented"));
   }
-  createScore(): Promise<LangfuseEntity> {
+  createScore(): ReturnType<ILangfuseClient["createScore"]> {
     return Promise.reject(new Error("FakeLangfuseClient.createScore not implemented"));
   }
-  getMetricsDaily(): Promise<LangfuseEntity> {
+  getMetricsDaily(): ReturnType<ILangfuseClient["getMetricsDaily"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getMetricsDaily not implemented"));
   }
-  getPrompts(): Promise<LangfuseList> {
+  getPrompts(): ReturnType<ILangfuseClient["getPrompts"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getPrompts not implemented"));
   }
-  getPrompt(): Promise<LangfuseEntity> {
+  getPrompt(): ReturnType<ILangfuseClient["getPrompt"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getPrompt not implemented"));
   }
-  createPrompt(): Promise<LangfuseEntity> {
+  createPrompt(): ReturnType<ILangfuseClient["createPrompt"]> {
     return Promise.reject(new Error("FakeLangfuseClient.createPrompt not implemented"));
   }
-  deletePrompt(): Promise<void> {
+  deletePrompt(): ReturnType<ILangfuseClient["deletePrompt"]> {
     return Promise.reject(new Error("FakeLangfuseClient.deletePrompt not implemented"));
   }
-  getScoreConfigs(): Promise<LangfuseList> {
+  getScoreConfigs(): ReturnType<ILangfuseClient["getScoreConfigs"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getScoreConfigs not implemented"));
   }
-  createScoreConfig(): Promise<LangfuseEntity> {
+  createScoreConfig(): ReturnType<ILangfuseClient["createScoreConfig"]> {
     return Promise.reject(new Error("FakeLangfuseClient.createScoreConfig not implemented"));
   }
-  getDatasets(): Promise<LangfuseList> {
+  getDatasets(): ReturnType<ILangfuseClient["getDatasets"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getDatasets not implemented"));
   }
-  createDataset(): Promise<LangfuseEntity> {
+  createDataset(): ReturnType<ILangfuseClient["createDataset"]> {
     return Promise.reject(new Error("FakeLangfuseClient.createDataset not implemented"));
   }
-  getDatasetItems(): Promise<LangfuseList> {
+  getDatasetItems(): ReturnType<ILangfuseClient["getDatasetItems"]> {
     return Promise.reject(new Error("FakeLangfuseClient.getDatasetItems not implemented"));
   }
-  createDatasetItem(): Promise<LangfuseEntity> {
+  createDatasetItem(): ReturnType<ILangfuseClient["createDatasetItem"]> {
     return Promise.reject(new Error("FakeLangfuseClient.createDatasetItem not implemented"));
   }
 }

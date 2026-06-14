@@ -1,4 +1,5 @@
 import { Controller, Get, Param } from "@nestjs/common";
+import type { ApiSession } from "langfuse";
 
 import type { ClientOverviewDto } from "@/modules/observations/application/dtos/client-overview.dto";
 import type { ConversationDetailDto } from "@/modules/observations/application/dtos/conversation-detail.dto";
@@ -6,7 +7,6 @@ import { GetClientOverviewUseCase } from "@/modules/observations/application/use
 import { GetConversationDetailUseCase } from "@/modules/observations/application/use-cases/get-conversation-detail.use-case";
 import { GetConversationListUseCase } from "@/modules/observations/application/use-cases/get-conversation-list.use-case";
 import { DomainNotFoundError } from "@/shared/domain/errors/domain-not-found.error";
-import type { LangfuseList } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 
 @Controller("observations")
 export class ObservationsController {
@@ -32,7 +32,7 @@ export class ObservationsController {
   }
 
   @Get("conversations")
-  listConversations(): Promise<LangfuseList> {
+  listConversations(): Promise<ApiSession[]> {
     return this.getConversationList.execute();
   }
 

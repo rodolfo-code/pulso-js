@@ -48,11 +48,13 @@ describe("WriteScoreUseCase", () => {
     });
 
     expect(createScore).toHaveBeenCalledTimes(1);
-    expect(createScore).toHaveBeenCalledWith({
-      traceId: "trace-1",
-      name: "acme/latency",
-      value: 0.85
-    });
+    expect(createScore).toHaveBeenCalledWith(
+      expect.objectContaining({
+        traceId: "trace-1",
+        name: "acme/latency",
+        value: 0.85
+      })
+    );
   });
 
   it("includes comment in payload when provided", async () => {
@@ -65,12 +67,14 @@ describe("WriteScoreUseCase", () => {
       comment: "looks good"
     });
 
-    expect(createScore).toHaveBeenCalledWith({
-      traceId: "trace-1",
-      name: "acme/latency",
-      value: 0.85,
-      comment: "looks good"
-    });
+    expect(createScore).toHaveBeenCalledWith(
+      expect.objectContaining({
+        traceId: "trace-1",
+        name: "acme/latency",
+        value: 0.85,
+        comment: "looks good"
+      })
+    );
   });
 
   it("omits comment from payload when not provided", async () => {

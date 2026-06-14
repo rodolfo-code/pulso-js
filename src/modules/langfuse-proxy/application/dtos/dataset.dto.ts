@@ -1,3 +1,5 @@
+import type { ApiDataset } from "langfuse";
+
 export class DatasetDto {
   constructor(
     public readonly id: string,
@@ -9,15 +11,15 @@ export class DatasetDto {
     public readonly updatedAt: Date
   ) {}
 
-  static fromLangfuse(d: Record<string, unknown>): DatasetDto {
+  static fromLangfuse(d: ApiDataset): DatasetDto {
     return new DatasetDto(
-      String(d["id"] ?? ""),
-      String(d["name"] ?? ""),
-      d["description"] == null ? null : String(d["description"]),
-      (d["metadata"] as Record<string, unknown>) ?? {},
-      String(d["projectId"] ?? ""),
-      new Date(String(d["createdAt"])),
-      new Date(String(d["updatedAt"]))
+      d.id,
+      d.name,
+      d.description ?? null,
+      (d.metadata ?? {}) as Record<string, unknown>,
+      d.projectId,
+      new Date(d.createdAt),
+      new Date(d.updatedAt)
     );
   }
 }

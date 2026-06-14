@@ -81,11 +81,7 @@ export class EvaluateSLOUseCase {
           ? allTraces.filter((t) => extractHierarchy(t).agent === agentSlug)
           : [];
         // Sort descending by timestamp (most recent first)
-        traces.sort((a, b) => {
-          const ta = String(a["timestamp"] ?? "");
-          const tb = String(b["timestamp"] ?? "");
-          return tb.localeCompare(ta);
-        });
+        traces.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
         if (traces.length > 0) {
           const kpis = calculateKpis(traces);
           if (kpis.totalRequests < this.minTraces) {
@@ -93,8 +89,7 @@ export class EvaluateSLOUseCase {
           } else {
             measuredValue = extractMetric(kpis, slo.metric);
             const firstTrace = traces[0];
-            const rawId = firstTrace?.["id"];
-            langfuseTraceRef = typeof rawId === "string" ? rawId : null;
+            langfuseTraceRef = firstTrace?.id ?? null;
           }
         }
       } catch (error) {

@@ -1,6 +1,14 @@
 import { KPIResult } from "@/shared/domain/value-objects/kpi-result.vo";
 
-type RawTrace = Record<string, unknown>;
+type RawTrace = {
+  level?: unknown;
+  tags?: unknown;
+  metadata?: unknown;
+  latency?: unknown;
+  totalCost?: unknown;
+  totalTokens?: unknown;
+  usage?: unknown;
+};
 
 export function calculateKpis(traces: RawTrace[]): KPIResult {
   const totalRequests = traces.length;
@@ -29,16 +37,16 @@ export function calculateKpis(traces: RawTrace[]): KPIResult {
 }
 
 function isError(trace: RawTrace): boolean {
-  if (trace["level"] === "ERROR") return true;
-  const tags = trace["tags"];
+  if (trace.level === "ERROR") return true;
+  const tags = trace.tags;
   if (Array.isArray(tags) && tags.includes("error")) return true;
-  const metadata = (trace["metadata"] as Record<string, unknown> | undefined) ?? {};
+  const metadata = (trace.metadata as Record<string, unknown> | undefined) ?? {};
   if (metadata["error"] === true) return true;
   return false;
 }
 
 function extractLatencyMs(trace: RawTrace): number {
-  const raw = trace["latency"];
+  const raw = trace.latency;
   if (raw === undefined || raw === null) return 0;
   const num = Number(raw);
   if (Number.isNaN(num)) return 0;
@@ -46,9 +54,9 @@ function extractLatencyMs(trace: RawTrace): number {
 }
 
 function extractTokens(trace: RawTrace): number {
-  let raw = trace["totalTokens"];
+  let raw = trace.totalTokens;
   if (raw === undefined || raw === null) {
-    const usage = (trace["usage"] as Record<string, unknown> | undefined) ?? {};
+    const usage = (trace.usage as Record<string, unknown> | undefined) ?? {};
     raw = usage["totalTokens"];
   }
   if (raw === undefined || raw === null) return 0;
@@ -58,7 +66,7 @@ function extractTokens(trace: RawTrace): number {
 }
 
 function extractCost(trace: RawTrace): number {
-  const raw = trace["totalCost"];
+  const raw = trace.totalCost;
   if (raw === undefined || raw === null) return 0;
   const num = Number(raw);
   if (Number.isNaN(num)) return 0;

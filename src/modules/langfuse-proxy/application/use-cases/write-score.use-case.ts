@@ -1,11 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
+import type { ApiCreateScoreRequest } from "langfuse";
 
 import { ScoreDto } from "@/modules/langfuse-proxy/application/dtos/score.dto";
 import { AuditLogEntry } from "@/shared/domain/entities/audit-log-entry.entity";
-import {
-  ILangfuseClient,
-  type LangfuseEntity
-} from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
+import { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 import { IAuditLogRepo } from "@/shared/repositories/interfaces/audit-log-repo.interface";
 
 export interface WriteScoreRequest {
@@ -25,18 +23,18 @@ export class WriteScoreUseCase {
   ) {}
 
   async execute(request: WriteScoreRequest): Promise<ScoreDto> {
-    const data: LangfuseEntity = {
+    const data: ApiCreateScoreRequest = {
       traceId: request.traceId,
       name: request.name,
       value: request.value
     };
     if (request.comment !== undefined) {
-      data["comment"] = request.comment;
+      data.comment = request.comment;
     }
 
     const raw = await this.langfuse.createScore(data);
 
-    const scoreId = String(raw["id"] ?? "");
+    const scoreId = raw.id;
 
     try {
       const entry = AuditLogEntry.create({
@@ -58,6 +56,19 @@ export class WriteScoreUseCase {
       );
     }
 
-    return ScoreDto.fromLangfuse(raw);
+    const now = new Date();
+    return new ScoreDto(
+      scoreId,
+      request.traceId,
+      request.name,
+      request.value,
+      "API",
+      "NUMERIC",
+      request.comment ?? null,
+      null,
+      null,
+      now,
+      now
+    );
   }
 }

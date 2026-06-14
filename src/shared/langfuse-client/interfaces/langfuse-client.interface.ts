@@ -1,40 +1,63 @@
+import type {
+  ApiCreateDatasetItemRequest,
+  ApiCreateDatasetRequest,
+  ApiCreatePromptRequest,
+  ApiCreateScoreConfigRequest,
+  ApiCreateScoreRequest,
+  ApiCreateScoreResponse,
+  ApiDataset,
+  ApiDatasetItem,
+  ApiGetScoresResponseData,
+  ApiHealthResponse,
+  ApiMetricsResponse,
+  ApiObservation,
+  ApiPrompt,
+  ApiPromptMeta,
+  ApiScoreConfig,
+  ApiSession,
+  ApiSessionWithTraces,
+  ApiTraceWithDetails,
+  ApiTraceWithFullDetails
+} from "langfuse";
+
 export type LangfuseFilters = Record<string, string | string[] | number | boolean | undefined>;
-export type LangfuseEntity = Record<string, unknown>;
-export type LangfuseList = LangfuseEntity[];
 
 export abstract class ILangfuseClient {
   // Health
-  abstract getHealth(): Promise<LangfuseEntity>;
+  abstract getHealth(): Promise<ApiHealthResponse>;
 
   // Traces
-  abstract getTraces(filters?: LangfuseFilters): Promise<LangfuseList>;
-  abstract getTrace(traceId: string): Promise<LangfuseEntity>;
-  abstract getTraceObservations(traceId: string): Promise<LangfuseList>;
+  abstract getTraces(filters?: LangfuseFilters): Promise<ApiTraceWithDetails[]>;
+  abstract getTrace(traceId: string): Promise<ApiTraceWithFullDetails>;
+  abstract getTraceObservations(traceId: string): Promise<ApiObservation[]>;
 
   // Sessions
-  abstract getSessions(filters?: LangfuseFilters): Promise<LangfuseList>;
-  abstract getSession(sessionId: string): Promise<LangfuseEntity>;
+  abstract getSessions(filters?: LangfuseFilters): Promise<ApiSession[]>;
+  abstract getSession(sessionId: string): Promise<ApiSessionWithTraces>;
 
   // Scores
-  abstract getScores(filters?: LangfuseFilters): Promise<LangfuseList>;
-  abstract createScore(data: LangfuseEntity): Promise<LangfuseEntity>;
+  abstract getScores(filters?: LangfuseFilters): Promise<ApiGetScoresResponseData[]>;
+  abstract createScore(data: ApiCreateScoreRequest): Promise<ApiCreateScoreResponse>;
 
   // Metrics
-  abstract getMetricsDaily(filters?: LangfuseFilters): Promise<LangfuseEntity>;
+  abstract getMetricsDaily(filters?: LangfuseFilters): Promise<ApiMetricsResponse>;
 
   // Prompts
-  abstract getPrompts(): Promise<LangfuseList>;
-  abstract getPrompt(name: string): Promise<LangfuseEntity>;
-  abstract createPrompt(data: LangfuseEntity): Promise<LangfuseEntity>;
+  abstract getPrompts(): Promise<ApiPromptMeta[]>;
+  abstract getPrompt(name: string): Promise<ApiPrompt>;
+  abstract createPrompt(data: ApiCreatePromptRequest): Promise<ApiPrompt>;
   abstract deletePrompt(name: string): Promise<void>;
 
   // Score Configs
-  abstract getScoreConfigs(): Promise<LangfuseList>;
-  abstract createScoreConfig(data: LangfuseEntity): Promise<LangfuseEntity>;
+  abstract getScoreConfigs(): Promise<ApiScoreConfig[]>;
+  abstract createScoreConfig(data: ApiCreateScoreConfigRequest): Promise<ApiScoreConfig>;
 
   // Datasets
-  abstract getDatasets(): Promise<LangfuseList>;
-  abstract createDataset(data: LangfuseEntity): Promise<LangfuseEntity>;
-  abstract getDatasetItems(name: string): Promise<LangfuseList>;
-  abstract createDatasetItem(name: string, data: LangfuseEntity): Promise<LangfuseEntity>;
+  abstract getDatasets(): Promise<ApiDataset[]>;
+  abstract createDataset(data: ApiCreateDatasetRequest): Promise<ApiDataset>;
+  abstract getDatasetItems(name: string): Promise<ApiDatasetItem[]>;
+  abstract createDatasetItem(
+    name: string,
+    data: ApiCreateDatasetItemRequest
+  ): Promise<ApiDatasetItem>;
 }

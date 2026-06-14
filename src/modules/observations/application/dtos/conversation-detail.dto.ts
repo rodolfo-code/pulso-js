@@ -1,5 +1,6 @@
+import type { ApiSession } from "langfuse";
+
 import type { HierarchyFields } from "@/shared/domain/value-objects/hierarchy-fields.vo";
-import type { LangfuseEntity } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 
 export interface EnrichedTraceDto extends Record<string, unknown> {
   hierarchy: {
@@ -12,6 +13,6 @@ export interface EnrichedTraceDto extends Record<string, unknown> {
 }
 
 export interface ConversationDetailDto {
-  readonly session: LangfuseEntity;
+  readonly session: ApiSession;
   readonly traces: EnrichedTraceDto[];
 }

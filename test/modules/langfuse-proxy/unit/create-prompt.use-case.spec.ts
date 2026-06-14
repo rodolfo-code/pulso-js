@@ -101,9 +101,8 @@ describe("CreatePromptUseCase", () => {
   });
 
   it("appends audit log with prompt_published action and canonical name", async () => {
-    const langfuseId = "550e8400-e29b-41d4-a716-446655440000";
     const { useCase, append } = makeUseCase({
-      createPromptResult: { id: langfuseId }
+      createPromptResult: { name: "acme/billing/v1/greeting", version: 3 }
     });
 
     await useCase.execute(DEFAULT_REQUEST);
@@ -112,7 +111,7 @@ describe("CreatePromptUseCase", () => {
     expect(append).toHaveBeenCalledWith(
       expect.objectContaining({
         entityType: "prompt",
-        entityId: langfuseId,
+        entityId: "acme/billing/v1/greeting:v3",
         action: "prompt_published",
         actor: "system",
         payload: { name: "acme/billing/v1/greeting" }
@@ -122,7 +121,6 @@ describe("CreatePromptUseCase", () => {
 
   it("returns a PromptDto mapped from the langfuse response", async () => {
     const langfuseResponse = {
-      id: "550e8400-e29b-41d4-a716-446655440000",
       name: "acme/billing/v1/greeting",
       version: 3
     };
@@ -132,7 +130,6 @@ describe("CreatePromptUseCase", () => {
 
     expect(result).toBeInstanceOf(PromptDto);
     expect(result).toMatchObject({
-      id: "550e8400-e29b-41d4-a716-446655440000",
       name: "acme/billing/v1/greeting",
       version: 3
     });
@@ -145,7 +142,10 @@ describe("CreatePromptUseCase", () => {
   });
 
   it("returns PromptDto even when audit log fails", async () => {
-    const langfuseResponse = { id: "550e8400-e29b-41d4-a716-446655440000" };
+    const langfuseResponse = {
+      name: "acme/billing/v1/greeting",
+      version: 7
+    };
     const { useCase } = makeUseCase({
       createPromptResult: langfuseResponse,
       auditShouldFail: true
@@ -154,6 +154,7 @@ describe("CreatePromptUseCase", () => {
     const result = await useCase.execute(DEFAULT_REQUEST);
 
     expect(result).toBeInstanceOf(PromptDto);
-    expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440000");
+    expect(result.name).toBe("acme/billing/v1/greeting");
+    expect(result.version).toBe(7);
   });
 });

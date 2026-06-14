@@ -115,9 +115,9 @@ describe("GetConversationDetailUseCase", () => {
         Promise.resolve([{ id: "real-t1", metadata: { agent: "bot" } }])
     });
     const result = await useCase.execute(SESSION_ID);
-    expect(result.session["traces"]).toBeUndefined();
-    expect(result.session["id"]).toBe(SESSION_ID);
-    expect(result.session["projectId"]).toBe("arius-observatory");
+    expect((result.session as unknown as Record<string, unknown>)["traces"]).toBeUndefined();
+    expect(result.session.id).toBe(SESSION_ID);
+    expect(result.session.projectId).toBe("arius-observatory");
     expect(result.traces).toHaveLength(1);
     expect(result.traces[0]?.id).toBe("real-t1");
   });

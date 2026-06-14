@@ -1,11 +1,9 @@
 import { Injectable } from "@nestjs/common";
+import type { ApiCreateScoreConfigRequest } from "langfuse";
 
 import { ScoreConfigDto } from "@/modules/langfuse-proxy/application/dtos/score-config.dto";
 import { buildScoreConfigName } from "@/shared/domain/services/taxonomy";
-import {
-  ILangfuseClient,
-  type LangfuseEntity
-} from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
+import { ILangfuseClient } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 
 export interface CreateScoreConfigRequest {
   tenantSlug?: string;
@@ -26,10 +24,10 @@ export class CreateScoreConfigUseCase {
     const { tenantSlug, ...rest } = request;
     void tenantSlug;
 
-    const payload: LangfuseEntity = {
+    const payload = {
       ...rest,
       name: canonicalName
-    };
+    } as unknown as ApiCreateScoreConfigRequest;
 
     const raw = await this.langfuse.createScoreConfig(payload);
     return ScoreConfigDto.fromLangfuse(raw);

@@ -1,23 +1,22 @@
+import type { ApiSession, ApiSessionWithTraces, ApiTrace } from "langfuse";
+
 export class SessionDto {
   constructor(
     public readonly id: string,
     public readonly projectId: string,
     public readonly createdAt: Date,
-    public readonly bookmarked: boolean,
-    public readonly isPublic: boolean,
     public readonly environment: string,
-    public readonly traces: Record<string, unknown>[]
+    public readonly traces: ApiTrace[]
   ) {}
 
-  static fromLangfuse(d: Record<string, unknown>): SessionDto {
+  static fromLangfuse(d: ApiSession | ApiSessionWithTraces): SessionDto {
+    const traces = "traces" in d && Array.isArray(d.traces) ? d.traces : [];
     return new SessionDto(
-      String(d["id"] ?? ""),
-      String(d["projectId"] ?? ""),
-      new Date(String(d["createdAt"])),
-      Boolean(d["bookmarked"]),
-      Boolean(d["public"]),
-      String(d["environment"] ?? "default"),
-      Array.isArray(d["traces"]) ? (d["traces"] as Record<string, unknown>[]) : []
+      d.id,
+      d.projectId,
+      new Date(d.createdAt),
+      d.environment ?? "default",
+      traces
     );
   }
 }

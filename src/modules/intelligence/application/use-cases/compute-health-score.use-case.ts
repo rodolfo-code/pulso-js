@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import type { ApiTraceWithDetails } from "langfuse";
 
 import type { EnvConfig } from "@/shared/config/env.config";
 import { BreakerState } from "@/shared/domain/entities/circuit-breaker-state.entity";
@@ -40,7 +41,7 @@ export class ComputeHealthScoreUseCase {
     const now = new Date();
 
     // Fetch traces from Langfuse and filter in-memory by agent slug (best-effort)
-    let traces: Record<string, unknown>[] = [];
+    let traces: ApiTraceWithDetails[] = [];
     try {
       const allTraces = await this.langfuse.getTraces();
       traces = allTraces.filter((t) => extractHierarchy(t).agent === slug);

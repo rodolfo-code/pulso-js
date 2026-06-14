@@ -85,7 +85,7 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Health ──────────────────────────────────────────────────────────
   it("GET /langfuse/health → returns mapped health DTO", async () => {
-    fakeLangfuse.getHealth.mockResolvedValueOnce({ status: "OK", version: "3.0" });
+    fakeLangfuse.getHealth.mockResolvedValueOnce({ status: "OK", version: "3.0" } as never);
 
     const res = await request(app!.getHttpServer()).get("/langfuse/health");
 
@@ -96,7 +96,7 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Traces ──────────────────────────────────────────────────────────
   it("GET /langfuse/traces → forwards query filters and returns list", async () => {
-    fakeLangfuse.getTraces.mockResolvedValueOnce([{ id: "t1" }, { id: "t2" }]);
+    fakeLangfuse.getTraces.mockResolvedValueOnce([{ id: "t1" }, { id: "t2" }] as never);
 
     const res = await request(app!.getHttpServer())
       .get("/langfuse/traces")
@@ -114,7 +114,7 @@ describe("LangfuseController (e2e)", () => {
   });
 
   it("GET /langfuse/traces/:traceId → calls getTrace with the id", async () => {
-    fakeLangfuse.getTrace.mockResolvedValueOnce({ id: "trace-abc" });
+    fakeLangfuse.getTrace.mockResolvedValueOnce({ id: "trace-abc" } as never);
 
     const res = await request(app!.getHttpServer()).get("/langfuse/traces/trace-abc");
 
@@ -124,7 +124,7 @@ describe("LangfuseController (e2e)", () => {
   });
 
   it("GET /langfuse/traces/:traceId/observations → calls getTraceObservations", async () => {
-    fakeLangfuse.getTraceObservations.mockResolvedValueOnce([{ id: "o1" }]);
+    fakeLangfuse.getTraceObservations.mockResolvedValueOnce([{ id: "o1" }] as never);
 
     const res = await request(app!.getHttpServer()).get(
       "/langfuse/traces/trace-abc/observations"
@@ -139,7 +139,7 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Sessions ────────────────────────────────────────────────────────
   it("GET /langfuse/sessions → forwards filters", async () => {
-    fakeLangfuse.getSessions.mockResolvedValueOnce([{ id: "s1" }]);
+    fakeLangfuse.getSessions.mockResolvedValueOnce([{ id: "s1" }] as never);
 
     const res = await request(app!.getHttpServer())
       .get("/langfuse/sessions")
@@ -154,7 +154,7 @@ describe("LangfuseController (e2e)", () => {
   });
 
   it("GET /langfuse/sessions/:sessionId → calls getSession with id", async () => {
-    fakeLangfuse.getSession.mockResolvedValueOnce({ id: "sess-abc" });
+    fakeLangfuse.getSession.mockResolvedValueOnce({ id: "sess-abc" } as never);
 
     const res = await request(app!.getHttpServer()).get("/langfuse/sessions/sess-abc");
 
@@ -165,7 +165,7 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Scores ──────────────────────────────────────────────────────────
   it("GET /langfuse/scores → forwards filters", async () => {
-    fakeLangfuse.getScores.mockResolvedValueOnce([{ id: "sc1" }]);
+    fakeLangfuse.getScores.mockResolvedValueOnce([{ id: "sc1" }] as never);
 
     const res = await request(app!.getHttpServer())
       .get("/langfuse/scores")
@@ -180,7 +180,7 @@ describe("LangfuseController (e2e)", () => {
   it("POST /langfuse/scores → calls createScore and appends audit", async () => {
     fakeLangfuse.createScore.mockResolvedValueOnce({
       id: "550e8400-e29b-41d4-a716-446655440000"
-    });
+    } as never);
 
     const res = await request(app!.getHttpServer()).post("/langfuse/scores").send({
       traceId: "trace-1",
@@ -230,7 +230,7 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Metrics ─────────────────────────────────────────────────────────
   it("GET /langfuse/metrics/daily → forwards filters and returns body", async () => {
-    fakeLangfuse.getMetricsDaily.mockResolvedValueOnce({ data: [{ traces: 42 }], meta: {} });
+    fakeLangfuse.getMetricsDaily.mockResolvedValueOnce({ data: [{ traces: 42 }], meta: {} } as never);
 
     const res = await request(app!.getHttpServer())
       .get("/langfuse/metrics/daily")
@@ -245,19 +245,21 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Prompts ─────────────────────────────────────────────────────────
   it("GET /langfuse/prompts → returns list", async () => {
-    fakeLangfuse.getPrompts.mockResolvedValueOnce([{ id: "p1" }]);
+    fakeLangfuse.getPrompts.mockResolvedValueOnce([
+      { name: "p1", versions: [1, 2] }
+    ] as never);
 
     const res = await request(app!.getHttpServer()).get("/langfuse/prompts");
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(1);
-    expect(res.body[0]).toMatchObject({ id: "p1" });
+    expect(res.body[0]).toMatchObject({ name: "p1", versions: [1, 2] });
   });
 
   it("POST /langfuse/prompts → builds canonical name and strips observatory fields", async () => {
     fakeLangfuse.createPrompt.mockResolvedValueOnce({
       id: "550e8400-e29b-41d4-a716-446655440002"
-    });
+    } as never);
 
     const res = await request(app!.getHttpServer()).post("/langfuse/prompts").send({
       tenantSlug: "acme",
@@ -295,7 +297,7 @@ describe("LangfuseController (e2e)", () => {
   });
 
   it("GET /langfuse/prompts/:multiSegmentName → captures the full path with slashes", async () => {
-    fakeLangfuse.getPrompt.mockResolvedValueOnce({ name: "acme/billing/v1/greeting" });
+    fakeLangfuse.getPrompt.mockResolvedValueOnce({ name: "acme/billing/v1/greeting" } as never);
 
     const res = await request(app!.getHttpServer()).get(
       "/langfuse/prompts/acme/billing/v1/greeting"
@@ -316,7 +318,7 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Score Configs ───────────────────────────────────────────────────
   it("GET /langfuse/score-configs → returns list", async () => {
-    fakeLangfuse.getScoreConfigs.mockResolvedValueOnce([{ id: "sc1" }]);
+    fakeLangfuse.getScoreConfigs.mockResolvedValueOnce([{ id: "sc1" }] as never);
 
     const res = await request(app!.getHttpServer()).get("/langfuse/score-configs");
 
@@ -328,7 +330,7 @@ describe("LangfuseController (e2e)", () => {
   it("POST /langfuse/score-configs → builds canonical name and strips tenantSlug", async () => {
     fakeLangfuse.createScoreConfig.mockResolvedValueOnce({
       id: "550e8400-e29b-41d4-a716-446655440003"
-    });
+    } as never);
 
     const res = await request(app!.getHttpServer())
       .post("/langfuse/score-configs")
@@ -351,7 +353,7 @@ describe("LangfuseController (e2e)", () => {
 
   // ── Datasets ────────────────────────────────────────────────────────
   it("GET /langfuse/datasets → returns list", async () => {
-    fakeLangfuse.getDatasets.mockResolvedValueOnce([{ id: "d1" }]);
+    fakeLangfuse.getDatasets.mockResolvedValueOnce([{ id: "d1" }] as never);
 
     const res = await request(app!.getHttpServer()).get("/langfuse/datasets");
 
@@ -361,7 +363,7 @@ describe("LangfuseController (e2e)", () => {
   });
 
   it("POST /langfuse/datasets → forwards body verbatim", async () => {
-    fakeLangfuse.createDataset.mockResolvedValueOnce({ id: "d-new" });
+    fakeLangfuse.createDataset.mockResolvedValueOnce({ id: "d-new" } as never);
 
     const res = await request(app!.getHttpServer())
       .post("/langfuse/datasets")
@@ -374,7 +376,7 @@ describe("LangfuseController (e2e)", () => {
   });
 
   it("GET /langfuse/datasets/:name/items → forwards name", async () => {
-    fakeLangfuse.getDatasetItems.mockResolvedValueOnce([{ id: "i1" }]);
+    fakeLangfuse.getDatasetItems.mockResolvedValueOnce([{ id: "i1" }] as never);
 
     const res = await request(app!.getHttpServer()).get(
       "/langfuse/datasets/eval-set/items"
@@ -387,7 +389,7 @@ describe("LangfuseController (e2e)", () => {
   });
 
   it("POST /langfuse/datasets/:name/items → forwards name and body", async () => {
-    fakeLangfuse.createDatasetItem.mockResolvedValueOnce({ id: "i-new" });
+    fakeLangfuse.createDatasetItem.mockResolvedValueOnce({ id: "i-new" } as never);
 
     const res = await request(app!.getHttpServer())
       .post("/langfuse/datasets/eval-set/items")

@@ -1,7 +1,9 @@
+import type { ApiGetScoresResponseData, ApiScore } from "langfuse";
+
 export class ScoreDto {
   constructor(
     public readonly id: string,
-    public readonly traceId: string,
+    public readonly traceId: string | null,
     public readonly name: string,
     public readonly value: number | string | null,
     public readonly source: string,
@@ -13,27 +15,26 @@ export class ScoreDto {
     public readonly updatedAt: Date
   ) {}
 
-  static fromLangfuse(d: Record<string, unknown>): ScoreDto {
-    const rawValue = d["value"];
+  static fromLangfuse(d: ApiGetScoresResponseData | ApiScore): ScoreDto {
     const value: number | string | null =
-      typeof rawValue === "number" || typeof rawValue === "string"
-        ? rawValue
-        : rawValue == null
-          ? null
-          : String(rawValue);
+      d.dataType === "CATEGORICAL"
+        ? (d.stringValue ?? null)
+        : typeof d.value === "number"
+          ? d.value
+          : null;
 
     return new ScoreDto(
-      String(d["id"] ?? ""),
-      String(d["traceId"] ?? ""),
-      String(d["name"] ?? ""),
+      d.id,
+      d.traceId ?? null,
+      d.name,
       value,
-      String(d["source"] ?? ""),
-      String(d["dataType"] ?? ""),
-      d["comment"] == null ? null : String(d["comment"]),
-      d["observationId"] == null ? null : String(d["observationId"]),
-      d["configId"] == null ? null : String(d["configId"]),
-      new Date(String(d["createdAt"])),
-      new Date(String(d["updatedAt"]))
+      d.source,
+      d.dataType,
+      d.comment ?? null,
+      d.observationId ?? null,
+      d.configId ?? null,
+      new Date(d.createdAt),
+      new Date(d.updatedAt)
     );
   }
 }

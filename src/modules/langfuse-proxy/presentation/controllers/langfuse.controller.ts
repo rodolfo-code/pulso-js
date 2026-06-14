@@ -9,12 +9,17 @@ import {
   Post,
   Query
 } from "@nestjs/common";
+import type {
+  ApiCreateDatasetItemRequest,
+  ApiCreateDatasetRequest
+} from "langfuse";
 
 import type { DatasetItemDto } from "@/modules/langfuse-proxy/application/dtos/dataset-item.dto";
 import type { DatasetDto } from "@/modules/langfuse-proxy/application/dtos/dataset.dto";
 import type { LangfuseHealthDto } from "@/modules/langfuse-proxy/application/dtos/langfuse-health.dto";
 import type { MetricsDailyDto } from "@/modules/langfuse-proxy/application/dtos/metrics-daily.dto";
 import type { ObservationDto } from "@/modules/langfuse-proxy/application/dtos/observation.dto";
+import type { PromptMetaDto } from "@/modules/langfuse-proxy/application/dtos/prompt-meta.dto";
 import type { PromptDto } from "@/modules/langfuse-proxy/application/dtos/prompt.dto";
 import type { ScoreConfigDto } from "@/modules/langfuse-proxy/application/dtos/score-config.dto";
 import type { ScoreDto } from "@/modules/langfuse-proxy/application/dtos/score.dto";
@@ -48,10 +53,7 @@ import { WriteScoreUseCase } from "@/modules/langfuse-proxy/application/use-case
 import { CreatePromptBody } from "@/modules/langfuse-proxy/presentation/dtos/create-prompt.body";
 import { CreateScoreConfigBody } from "@/modules/langfuse-proxy/presentation/dtos/create-score-config.body";
 import { WriteScoreBody } from "@/modules/langfuse-proxy/presentation/dtos/write-score.body";
-import type {
-  LangfuseEntity,
-  LangfuseFilters
-} from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
+import type { LangfuseFilters } from "@/shared/langfuse-client/interfaces/langfuse-client.interface";
 
 @Controller("langfuse")
 export class LangfuseController {
@@ -134,7 +136,7 @@ export class LangfuseController {
 
   // ── Prompts ─────────────────────────────────────────────────────────
   @Get("prompts")
-  listPrompts(): Promise<PromptDto[]> {
+  listPrompts(): Promise<PromptMetaDto[]> {
     return this.listPromptsUseCase.execute();
   }
 
@@ -176,7 +178,7 @@ export class LangfuseController {
   }
 
   @Post("datasets")
-  createDataset(@Body() body: LangfuseEntity): Promise<DatasetDto> {
+  createDataset(@Body() body: ApiCreateDatasetRequest): Promise<DatasetDto> {
     return this.createDatasetUseCase.execute(body);
   }
 
@@ -188,7 +190,7 @@ export class LangfuseController {
   @Post("datasets/:name/items")
   createDatasetItem(
     @Param("name") name: string,
-    @Body() body: LangfuseEntity
+    @Body() body: ApiCreateDatasetItemRequest
   ): Promise<DatasetItemDto> {
     return this.createDatasetItemUseCase.execute(name, body);
   }
